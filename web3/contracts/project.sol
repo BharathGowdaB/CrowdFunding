@@ -1,60 +1,65 @@
 // SPDX-License-Identifier: MIT
-pragma solidity  <0.8.0 ;
+pragma solidity >=0.7.0 <0.9.0;
 
 contract project {
-    uint public id;
-    string public title;
-    string public description;
-    address public creator;
-    uint public milestones;
-    uint public amount_raised;
-    uint public amount_received;
-    mapping(address=>uint) public backers;
-    address[] public addresses;
+    string private title;
+    string private description;
+    address private creator;
+    uint private amountRequired;
+    uint private amountRaised;
+
     enum state{
-        begin, intermediate,end
+        begin, intermediate, end
     }
-    state public stateValue;
+    state private stateValue;
 
-    constructor(uint _milestones){
+    address[] private milestones;
+    mapping(address => uint) private backers;
+
+    constructor(string memory _title, string memory _description, uint _amountRequired){
         creator = msg.sender;
-        milestones  = _milestones;
+        title = _title;
+        description = _description;
+        amountRaised = 0;
+        amountRequired = _amountRequired;
+        changeState(state.begin);
     }
 
-    function getProjectDetails() public view returns(address, uint, string memory, uint, uint,address[] memory,uint[] memory,uint){
-        address[] memory allAddresses = new address[](addresses.length);
-        uint[] memory allDeposits = new uint[](addresses.length);
-        for(uint i=0; i<addresses.length;i++) {
-            allAddresses[i] = addresses[i];
-            allDeposits[i] = backers[addresses[i]];
+    function getProjectDetails() public view 
+        returns(address, string memory, string memory, uint, uint){
+            return (creator, title, description, amountRequired, amountRaised);
         }
-        return (creator,id,description,amount_received,amount_raised,allAddresses,allDeposits,milestones);
+    
+    function fundProject() public payable {
+        assert(msg.sender != creator);
+        assert(stateValue != state.end);
+
+        backers[msg.sender] = msg.value;
+        amountRaised += msg.value;
     }
 
-    function createMilestones(uint _milestones) public  {
-        require(amount_received == milestones, "Insufficient funds can't create a new milestone");
-        milestones = _milestones;
+    function getMilestones() public view
+        returns(address[] memory){
+            address[] memory milestoneList = milestones;
+            return milestoneList;
+        }
+
+    function createMilestones() public  {
+        address temp = address(0x112211);
+        milestones.push(temp);
     }
 
-    function changeState() public {
-        if(amount_received <= milestones){
-            stateValue = state.begin;
-        }
-        else if(amount_received == milestones){
-            stateValue = state.intermediate;
-        }
-        else {
-            stateValue = state.end;
-        }
+    function changeState(state _state) internal {
+        stateValue = _state;
     }
 
     function abortProject() public {
-        require(msg.sender == creator);
-        selfdestruct(payable(creator));
-    }
+        if(stateValue == state.begin){
+            require(msg.sender == creator);
+            return;
+        }
 
-    function distributeReward() public {
-
+        // Voting 
     }
 
 }
