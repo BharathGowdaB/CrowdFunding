@@ -7,8 +7,8 @@ contract project {
     string public description;
     address public creator;
     uint public milestones;
-    uint public amount_raised = 1000;
-    uint public amount_received = 400;
+    uint public amount_raised;
+    uint public amount_received;
     mapping(address=>uint) public backers;
     address[] public addresses;
     enum state{
