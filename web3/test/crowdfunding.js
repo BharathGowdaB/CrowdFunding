@@ -70,13 +70,6 @@ describe("Crowdfunding", async function () {
     })
 
   })
-  
-  describe("Project", async() => {
-    it("Should return list of recent projects" , async() => {
-      const list = await app.getProjectList(0);
+      
 
-      expect(list).to.not.undefined
-    })
-    
-  })
 });

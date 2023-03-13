@@ -55,10 +55,9 @@ contract Project {
         state = _state;
     }
 
-    function abortProject() public {
+    function abortProject() public view{
         if(state == ProjectState.initial){
             require(msg.sender == creator);
-            return;
         }
 
         // Voting 

@@ -1,6 +1,7 @@
 pragma solidity >=0.7.0 <0.9.0;
 import {User} from './user.sol';
 import {Project} from './project.sol';
+import { maxGetProjectList } from './utils/constant.sol';
 
 contract Starter is User{
     Project[] private projectList;
@@ -13,14 +14,14 @@ contract Starter is User{
         projectList.push(new Project(_title,_description, _amountRequired, _endDate));
     }
 
-    function getProjectList(uint skip) public view returns(address[] memory){
-        assert(skip <= projectList.length);
+    function getProjectList(uint _skip) public view returns(address[] memory){
+        assert(_skip <= projectList.length);
     
-        uint length = skip + maxGetProjectList <= projectList.length ? maxGetProjectList : projectList.length - skip;
+        uint length = (_skip + maxGetProjectList <= projectList.length) ? maxGetProjectList : (projectList.length - _skip);
         address[] memory list = new address[](length);
 
         for(uint i = 0 ; i < length ; i++ ){
-            list[i] = projectList[i + skip];
+            list[i] = address(projectList[i + _skip]);
         }
         
         return list;
