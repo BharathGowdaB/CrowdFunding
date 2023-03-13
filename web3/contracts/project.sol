@@ -34,7 +34,7 @@ contract Project {
     
     function fundProject() public payable {
         assert(msg.sender != creator);
-        assert(stateValue != state.end);
+        assert(state != ProjectState.ended);
 
         backers[msg.sender] = msg.value;
         amountRaised += msg.value;
