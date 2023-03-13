@@ -1,28 +1,30 @@
-// SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.9.0;
+import {ProjectState} from './utils/definations.sol';
 
-contract project {
+contract Project {
     string private title;
     string private description;
     address private creator;
     uint private amountRequired;
     uint private amountRaised;
+    uint private startDate;
+    uint private endDate;
 
-    enum state{
-        begin, intermediate, end
-    }
-    state private stateValue;
+    ProjectState private state;
 
     address[] private milestones;
     mapping(address => uint) private backers;
 
-    constructor(string memory _title, string memory _description, uint _amountRequired){
+    constructor(string memory _title, string memory _description, uint _amountRequired, uint _endDate){
+        startDate = block.timestamp;
+        require(_endDate > startDate, 'Cannot End Project Before Starting');
         creator = msg.sender;
         title = _title;
         description = _description;
         amountRaised = 0;
         amountRequired = _amountRequired;
-        changeState(state.begin);
+        endDate = _endDate;
+        changeState(ProjectState.initial);
     }
 
     function getProjectDetails() public view 
@@ -49,12 +51,12 @@ contract project {
         milestones.push(temp);
     }
 
-    function changeState(state _state) internal {
-        stateValue = _state;
+    function changeState(ProjectState _state) internal {
+        state = _state;
     }
 
     function abortProject() public {
-        if(stateValue == state.begin){
+        if(state == ProjectState.initial){
             require(msg.sender == creator);
             return;
         }

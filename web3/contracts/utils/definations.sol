@@ -4,6 +4,10 @@ enum VerificationState {
     initial, inProgress, failed, verified
 }
 
+enum ProjectState{
+    initial, inFunding, inExecution, ended, rejected, aborted
+}
+
 struct AttestData {
     string name;
     string panNumber;
@@ -14,3 +18,4 @@ struct VerificationData {
     AttestData  data;
     VerificationState state;
 }
+

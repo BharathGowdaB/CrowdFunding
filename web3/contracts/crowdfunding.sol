@@ -11,7 +11,7 @@ contract crowdfunding{
     mapping(string => Starter) private starterList;
     mapping(Starter => VerificationData) private verifiedList;
 
-    address[] private projectList;
+    // address[] private projectList;
 
     constructor(){
         admin = msg.sender;
@@ -27,18 +27,18 @@ contract crowdfunding{
         return starterList[_email].authenticate(msg.sender, bytes(_email), bytes(_password));
     }
 
-    function getProjectList(uint skip) public view returns(address[] memory){
-        assert(skip <= projectList.length);
+    // function getProjectList(uint skip) public view returns(address[] memory){
+    //     assert(skip <= projectList.length);
     
-        uint length = skip + maxGetProjectList <= projectList.length ? maxGetProjectList : projectList.length - skip;
-        address[] memory list = new address[](length);
+    //     uint length = skip + maxGetProjectList <= projectList.length ? maxGetProjectList : projectList.length - skip;
+    //     address[] memory list = new address[](length);
 
-        for(uint i = 0 ; i < length ; i++ ){
-            list[i] = projectList[i + skip];
-        }
+    //     for(uint i = 0 ; i < length ; i++ ){
+    //         list[i] = projectList[i + skip];
+    //     }
         
-        return list;
-    }
+    //     return list;
+    // }
 
     function kycVerification(string memory _email, string memory _password, AttestData memory _kycData) public {
         require(starterList[_email] != Starter(address(0)), 'Email Not Registered');
