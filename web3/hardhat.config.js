@@ -6,7 +6,6 @@ module.exports = {
   defaultNetwork: 'hardhat',
     networks: {
       hardhat: {
-    
       },
       goerli: {
         url: 'https://rpc.ankr.com/polygon_mumbai',
@@ -15,8 +14,9 @@ module.exports = {
     },
     settings: {
       optimizer: {
-        enabled: true,
+        enabled: false,
         runs: 200,
       },
     },
+
 };

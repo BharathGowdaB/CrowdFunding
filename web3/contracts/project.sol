@@ -1,29 +1,30 @@
 pragma solidity >=0.7.0 <0.9.0;
-import {ProjectState} from './utils/definations.sol';
 
-contract Project {
-    string private title;
-    string private description;
-    address private creator;
-    uint private amountRequired;
-    uint private amountRaised;
-    uint private startDate;
-    uint private endDate;
+import { ProjectState } from './utils/definations.sol';
 
-    ProjectState private state;
+contract ProjectGeneric {
+    string internal title;
+    string internal description;
+    address internal creator;
+    uint internal amountRequired;
+    uint internal amountRaised;
+    uint internal startTime;
+    uint internal endTime;
 
-    address[] private milestones;
-    mapping(address => uint) private backers;
+    ProjectState internal state;
 
-    constructor(string memory _title, string memory _description, uint _amountRequired, uint _endDate){
-        startDate = block.timestamp;
-        require(_endDate > startDate, 'Cannot End Project Before Starting');
+    address[] internal milestones;
+    mapping(address => uint) internal backers;
+
+    constructor(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration){
+        startTime= block.timestamp;
+        require(_fundingDuration > 1 hours, 'Cannot End Project Before Starting');
         creator = msg.sender;
         title = _title;
         description = _description;
         amountRaised = 0;
         amountRequired = _amountRequired;
-        endDate = _endDate;
+        endTime = startTime + _fundingDuration;
         changeState(ProjectState.initial);
     }
 
@@ -32,6 +33,17 @@ contract Project {
             return (creator, title, description, amountRequired, amountRaised);
         }
     
+    function changeState(ProjectState _state) internal {
+        state = _state;
+    }
+
+}
+
+contract Project is ProjectGeneric {
+
+    constructor(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration)
+    ProjectGeneric(_title, _description , _amountRequired, _fundingDuration) { }
+
     function fundProject() public payable {
         assert(msg.sender != creator);
         assert(state != ProjectState.ended);
@@ -51,9 +63,7 @@ contract Project {
         milestones.push(temp);
     }
 
-    function changeState(ProjectState _state) internal {
-        state = _state;
-    }
+    
 
     function abortProject() public view{
         if(state == ProjectState.initial){
@@ -62,5 +72,4 @@ contract Project {
 
         // Voting 
     }
-
 }

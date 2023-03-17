@@ -1,16 +1,9 @@
 const { time, loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 const { ethers } = require("hardhat");
 const { expect } = require("chai");
+const deployer = require("../utils/deployer")
 
 describe("Crowdfunding", async function () {
-  const [owner, otherAccount] = await ethers.getSigners();
-
-  const App = await ethers.getContractFactory("crowdfunding");
-  const app = await App.deploy();
-
-  app.on("VerifyUser", (address) => {
-    console.log('emit caught', address)
-  });
 
   const user1 = {
     name: 'Bharath',
@@ -18,11 +11,17 @@ describe("Crowdfunding", async function () {
     password: '231020'
   }
   
+  const { dbAddress, crowdfundinAddress} = await deployer.deployContracts()
+
+  const app = await (await ethers.getContractFactory('Crowdfunding')).attach(crowdfundinAddress);
+  const db = await (await ethers.getContractFactory("DatabaseSorter")).attach(dbAddress);
 
   describe("Starter" , async () => {
     it("Should Create New Starter", async () => {
       const user = await app.newStarter(user1.name, user1.email, user1.password);
       expect(user).not.undefined;
+
+      console.log(await db.getStarterList(0))
     });
 
     it("Should Not Create Starter if Email Registered", async() => {
