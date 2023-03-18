@@ -40,7 +40,12 @@ contract Project {
     }
 
     function addBacker(address _backerAddress) public payable {
-        // your logic
+        require(msg.value > 0, "Must send some Ether");
+        require(amountRaised + msg.value <= amountRequired, "Funding goal reached");
+
+        amountRaised += msg.value;
+        backers[_backerAddress] += msg.value;
+
     }
 
 }
