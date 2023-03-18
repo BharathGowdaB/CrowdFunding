@@ -3,7 +3,7 @@ const fs = require('fs')
 const deployer = require('../utils/deployer')
 
 async function deploy() {
-    run("compile");
+    //await run("compile");
 
     const {dbAddress, crowdfundingAddress} = await deployer.deployContracts()
 

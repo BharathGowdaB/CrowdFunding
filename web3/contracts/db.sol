@@ -1,7 +1,7 @@
 pragma solidity >=0.7.0 <0.9.0;
 
-import { StarterGeneric } from './starter.sol';
-import { ProjectGeneric } from './project.sol';
+//import { User } from './user.sol';
+//import { ProjectGeneric } from './project.sol';
 import { maxGetProjectList, maxGetStarterList} from './utils/constant.sol';
 
 contract Database {

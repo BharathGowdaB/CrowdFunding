@@ -14,6 +14,7 @@
     "hardhat": "^2.13.0"
   },
   "dependencies": {
+    "@ethersproject/contracts": "^5.7.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@thirdweb-dev/contracts": "^3.4.4"
   }

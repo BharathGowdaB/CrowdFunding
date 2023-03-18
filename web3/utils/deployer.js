@@ -8,18 +8,18 @@ async function dbDeployer() {
   const [owner, otherAccount] = await ethers.getSigners();
 
   const Database = await ethers.getContractFactory("DatabaseSorter");
-  const tx = await Database.deploy({overwrite: true });
+  const tx = await Database.deploy();
 
-  console.log(tx)
+  
   const db = await tx.deployTransaction.wait();
   dbAddress = db.contractAddress;
 
   // Saving dbAddress in Solidity file-------------------------------------
   const solPath =  path.resolve(__dirname , '..', 'contracts' , 'utils' ,'db.address.sol');
 
-  fs.writeFileSync(solPath, `address constant dbAddress = ${dbAddress} ;`);
+  fs.writeFileSync(solPath, `pragma solidity >=0.7.0 <0.9.0; \naddress constant dbAddress = ${dbAddress} ;`);
 
-  run('compile')
+  await run('compile')
 
   return dbAddress;
 }

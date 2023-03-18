@@ -2,21 +2,22 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import { ProjectState } from './utils/definations.sol';
 
-contract ProjectGeneric {
+contract Project {
+    address internal creator;
     string internal title;
     string internal description;
-    address internal creator;
     uint internal amountRequired;
     uint internal amountRaised;
     uint internal startTime;
     uint internal endTime;
+    bool internal isCharity = false;
 
     ProjectState internal state;
 
     address[] internal milestones;
     mapping(address => uint) internal backers;
 
-    constructor(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration){
+    constructor(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration, bool _isCharity){
         startTime= block.timestamp;
         require(_fundingDuration > 1 hours, 'Cannot End Project Before Starting');
         creator = msg.sender;
@@ -26,6 +27,7 @@ contract ProjectGeneric {
         amountRequired = _amountRequired;
         endTime = startTime + _fundingDuration;
         changeState(ProjectState.initial);
+        isCharity = _isCharity;
     }
 
     function getProjectDetails() public view 
@@ -37,39 +39,9 @@ contract ProjectGeneric {
         state = _state;
     }
 
+    function addBacker(address _backerAddress) public payable {
+        // your logic
+    }
+
 }
 
-contract Project is ProjectGeneric {
-
-    constructor(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration)
-    ProjectGeneric(_title, _description , _amountRequired, _fundingDuration) { }
-
-    function fundProject() public payable {
-        assert(msg.sender != creator);
-        assert(state != ProjectState.ended);
-
-        backers[msg.sender] = msg.value;
-        amountRaised += msg.value;
-    }
-
-    function getMilestones() public view
-        returns(address[] memory){
-            address[] memory milestoneList = milestones;
-            return milestoneList;
-        }
-
-    function createMilestones() public  {
-        address temp = address(0x112211);
-        milestones.push(temp);
-    }
-
-    
-
-    function abortProject() public view{
-        if(state == ProjectState.initial){
-            require(msg.sender == creator);
-        }
-
-        // Voting 
-    }
-}
