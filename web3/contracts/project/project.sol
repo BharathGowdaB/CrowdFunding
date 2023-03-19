@@ -1,6 +1,7 @@
+//SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.7.0 <0.9.0;
 
-import { ProjectState } from './utils/definations.sol';
+import { ProjectState } from '../utils/definitions.sol';
 
 contract Project {
     address internal creator;
@@ -17,10 +18,10 @@ contract Project {
     address[] internal milestones;
     mapping(address => uint) internal backers;
 
-    constructor(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration, bool _isCharity){
+    constructor(address _creator, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration, bool _isCharity){
         startTime= block.timestamp;
         require(_fundingDuration > 1 hours, 'Cannot End Project Before Starting');
-        creator = msg.sender;
+        creator = _creator;
         title = _title;
         description = _description;
         amountRaised = 0;

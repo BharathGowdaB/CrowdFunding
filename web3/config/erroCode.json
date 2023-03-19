@@ -1,0 +1,6 @@
+{
+  "401" : "Unauthorized",
+  "402" : "Email Already Registered",
+  "405" : "Email Not Registered"
+
+}

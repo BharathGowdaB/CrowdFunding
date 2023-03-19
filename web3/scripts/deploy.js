@@ -1,9 +1,9 @@
+const {run } = require('hardhat')
 const path = require('path')
 const fs = require('fs')
 const deployer = require('../utils/deployer')
 
 async function deploy() {
-    //await run("compile");
 
     const {dbAddress, crowdfundingAddress} = await deployer.deployContracts()
 
@@ -18,7 +18,7 @@ async function deploy() {
   
     fs.writeFileSync(filePath, newContent);
 
-    console.log("MyContract deployed to:", '\nDatabase : ', dbAddress , '\nCrowdfunding : ', crowdfundingAddress);
+    //console.log("MyContract deployed to:", '\nDatabase : ', dbAddress , '\nCrowdfunding : ', crowdfundingAddress);
 };
 
 deploy().catch(err => {

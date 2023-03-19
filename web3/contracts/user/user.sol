@@ -1,14 +1,14 @@
+//SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.7.0 <0.9.0;
 
-import { Project } from './project.sol';
-import { maxGetProjectList} from './utils/constant.sol';
+import { maxGetProjectList} from '../utils/constant.sol';
 
 contract User{
     address public id;
     string internal name;
     bytes internal email;
     bytes32 internal password;
-    Project[] internal projectList;
+    address[] internal projectList;
 
     constructor (address _address, string memory _name, string memory _email, string memory _password){
         id = _address;
@@ -38,7 +38,7 @@ contract User{
             address[] memory list = new address[](length);
 
             for(uint i = 0 ; i < length ; i++ ){
-                list[i] = address(projectList[i + _skip]);
+                list[i] = projectList[i + _skip];
             }
         
             return list;

@@ -1,3 +1,4 @@
+//SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.7.0 <0.9.0;
 
 import { Project } from './project.sol';
@@ -6,8 +7,8 @@ import { Milestone } from './milestone.sol';
 contract Startup is Project {
     Milestone[] internal milestoneList;
 
-    constructor(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration)
-    Project(_title, _description , _amountRequired, _fundingDuration, false) { }
+    constructor(address _creator, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration)
+    Project(_creator, _title, _description , _amountRequired, _fundingDuration, false) { }
 
     function addMileStone() public {
         // your logic

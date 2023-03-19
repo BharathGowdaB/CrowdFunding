@@ -1,4 +1,4 @@
-const { task  } = require("hardhat/config");
+const { task } = require("hardhat/config");
 
 require("@nomicfoundation/hardhat-toolbox");
 
@@ -27,6 +27,7 @@ module.exports = {
       enabled: false,
       runs: 200,
     },
+    
   },
 
 
