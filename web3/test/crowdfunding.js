@@ -34,7 +34,7 @@ describe("Crowdfunding Contract", async () => {
       const user = await app.authenticateStarter(starterDetails.email, starterDetails.password);
   
       expect(user).to.match(/^0x[a-fA-F0-9]{40}$/);
-      expect((await db.getStarterList(0))[0]).to.equals(user)
+      expect((await db.getStarterList(0))[0][0]).to.equals(user)
     });
 
     it("Should Not Create Starter if Email Registered", async() => {

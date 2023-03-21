@@ -7,7 +7,7 @@ import { Startup } from '../project/startup.sol';
 import { maxGetProjectList, maxGetStarterList} from '../utils/constant.sol';
 
 contract Database {
-  address private admin;
+  address public admin;
   address[] internal starterList;
   address[] internal projectList;
 
@@ -21,11 +21,11 @@ contract Database {
     starterList.push(_starter);
   }
 
-  function addProject(string memory _title, string memory _description, uint _amountRequired, uint _endTime, bool _isCharity) public returns(address){
+  function addProject(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration, bool _isCharity) public returns(address){
       if(_isCharity)
-          projectList.push(address(new Charity(msg.sender, _title,_description, _amountRequired, _endTime)));
+          projectList.push(address(new Charity(msg.sender, _title,_description, _amountRequired, _fundingDuration)));
       else
-          projectList.push(address(new Startup(msg.sender, _title,_description, _amountRequired, _endTime)));
+          projectList.push(address(new Startup(msg.sender, _title,_description, _amountRequired, _fundingDuration)));
 
       return projectList[projectList.length -  1];
   }
@@ -34,15 +34,15 @@ contract Database {
 
 contract DatabaseSorter is Database {
 
-  function getStarterList(uint _skip) public view returns(address[] memory){
+  function getStarterList(uint _skip) public view returns(address[] memory, uint){
       return sorter(starterList, maxGetStarterList, _skip);
   }
 
-  function getProjectList(uint _skip) public view returns(address[] memory){
+  function getProjectList(uint _skip) public view returns(address[] memory, uint){
       return sorter(projectList, maxGetProjectList, _skip);
   }
 
-  function sorter(address[] storage array, uint maxLimit, uint _skip) internal view returns(address[] memory){
+  function sorter(address[] storage array, uint maxLimit, uint _skip) internal view returns(address[] memory, uint){
     assert(_skip <= array.length);
     
     uint length = (_skip + maxLimit <= array.length) ? maxLimit : (array.length - _skip);
@@ -52,7 +52,7 @@ contract DatabaseSorter is Database {
         list[i] = array[i + _skip];
     }
         
-    return list;
+    return (list, array.length);
   }
-  
+
 }

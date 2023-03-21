@@ -11,9 +11,9 @@ contract Starter is User{
         User(_address, _name, _email, _password){}
     
     
-    function createProject(string memory _title, string memory _description, uint _amountRequired, uint _endTime, bool _isCharity) public 
+    function createProject(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration, bool _isCharity) public 
         {
             require(id == msg.sender, "401");
-            projectList.push(Database(dbAddress).addProject(_title, _description, _amountRequired, _endTime, _isCharity));
+            projectList.push(Database(dbAddress).addProject(_title, _description, _amountRequired, _fundingDuration, _isCharity));
         }
 }
