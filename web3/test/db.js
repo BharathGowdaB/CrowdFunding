@@ -1,18 +1,31 @@
 const { ethers  } = require("hardhat");
 const { expect } = require("chai");
-const deployer = require("../utils/deployer")
-const {verificationState, VerificationState} = require("../config/enumDefinitions")
+const {deployContract, VerificationState, createProjects , constants, starterDetails} = require('./util.js');
+const { ProjectState } = require("../config/enumDefinitions.js");
 
 let app ;
 let db ;
+let Project;
+
 
 before(async () => {
-  const { dbAddress, crowdfundingAddress} = await deployer.deployContracts()
-  app = await (await ethers.getContractFactory('Crowdfunding')).attach(crowdfundingAddress);
-  db = await (await ethers.getContractFactory("DatabaseSorter")).attach(dbAddress);
+  constracts = await deployContract();
+  app = constracts.app;
+  db = constracts.db;
+
+  Project = await ethers.getContractFactory("Project")
+
+  await app.createStarter(starterDetails.name, 'testGetMaxLimitProject@gmail.com' , starterDetails.password)
+  const user = await app.authenticateStarter('testGetMaxLimitProject@gmail.com' , starterDetails.password)
+
+  await app.verifyStarter(user, VerificationState.verified)
+
+  await createProjects(user, 10)
 })
 
+
 describe('Database', async() => {
+
   it('Should Database Admin to be Crowdfunding Contract', async() => {
     expect(await db.admin()).equals(app.address)
   })
@@ -28,36 +41,79 @@ describe('Database', async() => {
     await expect(tx).to.be.reverted
   })
 
-  it('Should Create New Charity Project', async() => {
-    const charity = {
-      title : 'Charity101',
-      description : 'testing',
-      amountRequired : 100,
-      fundingDuration : 60 * 60 * 1000 + 1
-    }
-    const [projects, count] = await db.getProjectList(0)
-    const currentProjectsCount = parseInt(count)
+  it('Should Only Retrieve maxLimit no. of Project addresses' , async () => {
+    const [list, count] = await db.getProjectList({skip: 0})
+    expect(count).equals(10)
+    expect(list.length).equals(constants.maxGetProjectList)
+  })
 
-    const tx = await db.addProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true)
+  it('Should skip first 3 Project addresses while retrival' , async () => {
+    const [list, count] = await db.getProjectList({skip: 0})
+    const [list2, count2] = await db.getProjectList({skip: 3})
+
+    expect(list2[0]).equals(list[3])
+  })
+
+  it('Should return only the last 2 Project Address' , async () => {
+    const [list, count] = await db.getProjectList({skip: 0})
+    const [list2, count2] = await db.getProjectList({skip: count - 2})
+
+    expect(list2.length).equals(2)
+  })
+
+  it('Should Return Project List Sorted By Recent First', async() => {
+    const [list, count] = await db.getProjectList({skip: 0, recent: true})
+
+    const [last] = await db.getProjectList({skip: count - 1})
+    expect(list[0]).equals(last[0])
+  })
+
+  it('Should Return Only Charity Projects', async() => {
+    await app.createStarter(starterDetails.name, 'testGetOnlyCharityProject@gmail.com' , starterDetails.password)
+    const user = await app.authenticateStarter('testGetOnlyCharityProject@gmail.com' , starterDetails.password)
+
+    await app.verifyStarter(user, VerificationState.verified)
+
+    await createProjects(user, 3 , true)
     
-    expect(parseInt((await db.getProjectList(0))[1])).to.equals(currentProjectsCount + 1)
+    const [list, count] = await db.getProjectList({skip: 0, onlyCharity: true})
+
+    list.forEach(async (address) => {
+      expect(await Project.attach(address).isCharity()).equals(true)
+    })
     
   })
 
-  it('Should Create New Startup Project', async() => {
-    const startup = {
+  it('Should Return Only StartUp Projects', async() => {
+   
+    const [list, count] = await db.getProjectList({skip: 0, onlyStartup: true})
+
+    list.forEach(async (address) => {
+      expect(await Project.attach(address).isCharity()).equals(false)
+    })
+    
+  })
+
+  it('Should Return Popular Projects', async() => {
+   
+    const DatabaseMock = await ethers.getContractFactory("DatabaseMock");
+    const databaseMock  = await DatabaseMock.deploy();
+
+    const project = {
       title : 'Startup',
       description : 'testing',
       amountRequired : 100,
-      fundingDuration : 60 * 60 * 1000 + 1
+      fundingDuration : 60 * 60 * 1000 + 1,
+      isCharity : false
     }
-    const [projects, count] = await db.getProjectList(0)
-    const currentProjectsCount = parseInt(count)
 
-    const tx = await db.addProject(startup.title , startup.description, startup.amountRequired, startup.fundingDuration, true)
-    
-    expect(parseInt((await db.getProjectList(0))[1])).to.equals(currentProjectsCount + 1)
+    for(i = 0 ; i < 3 ; i++){
+      databaseMock.addProjectMock(i + project.title , project.description, project.amountRequired, project.fundingDuration, project.isCharity, i  )
+    }
+    const [list, count] = await databaseMock.getProjectList({skip: 0})    
+    const [popularList, popularCount] = await databaseMock.getProjectList({skip: 0, popular: true})
+
+    expect(list[2]).equals(popularList[0])
     
   })
-
 })

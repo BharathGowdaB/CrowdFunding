@@ -5,13 +5,13 @@ import { Starter } from '../user/starter.sol';
 import { Backer } from '../user/backer.sol';
 import { Database } from './db.sol';
 import { AttestData, VerificationState, VerificationData } from '../utils/definitions.sol';
-import { minUpdateGap } from '../utils/constant.sol';
+import { minUpdateGap } from '../utils/constants.sol';
 import { dbAddress } from '../utils/db.address.sol';
 
 contract Crowdfunding{
     event VerifyUser(address);
 
-    Database private db;
+    Database public db;
     address private admin;
 
     mapping(string => Backer) private backerList;
@@ -71,10 +71,10 @@ contract Crowdfunding{
             verifiedList[_starter].state = _state;
         }
 
-    function checkStarterVerified(Starter _starter) public view 
+    function checkStarterVerified(address _starter) public view 
         returns(VerificationState)
         {
-            return verifiedList[_starter].state;
+            return verifiedList[Starter(_starter)].state;
         }
     
 }

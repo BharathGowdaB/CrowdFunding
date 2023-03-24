@@ -1,9 +1,17 @@
 const {run } = require('hardhat')
 const path = require('path')
 const fs = require('fs')
-const deployer = require('../utils/deployer')
+const deployer = require('../utils/contractDeployer.js')
+const { initConstants , initDefinitions} = require('../utils/configInitializer.js')
 
 async function deploy() {
+    const enumList = require('../config/enumDefinitions.js')
+    const structList = require('../config/structDefinitions.js')
+   
+    await initDefinitions(enumList, structList)
+
+    const constList = require('../config/constants.js')
+    await initConstants(constList)
 
     const {dbAddress, crowdfundingAddress} = await deployer.deployContracts()
 

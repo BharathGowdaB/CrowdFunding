@@ -20,3 +20,12 @@ struct VerificationData {
 	VerificationState state; 
 }
 
+struct SortData {
+	uint skip; 
+	bool noSort; 
+	bool recent; 
+	bool popular; 
+	bool onlyCharity; 
+	bool onlyStartup; 
+}
+

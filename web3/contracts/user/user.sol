@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.7.0 <0.9.0;
 
-import { maxGetProjectList} from '../utils/constant.sol';
+import { maxGetProjectList} from '../utils/constants.sol';
 
 contract User{
     address public id;

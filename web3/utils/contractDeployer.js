@@ -2,36 +2,6 @@ const hre = require("hardhat");
 const fs = require('fs');
 const path = require('path');
 
-async function initDefinitions(){
-  const solPath =  path.resolve(__dirname , '..', 'contracts' , 'utils' ,'definitions.sol');
-
-  let content = `//SPDX-License-Identifier: UNLICENSED \npragma solidity >=0.7.0 <0.9.0; \n\n`
-
-  const enumList = require('../config/enumDefinitions')
-
-  Object.keys(enumList).forEach((key) => {
-    content += `enum ${key} {\n\t`
-    Object.keys(enumList[key]).forEach((k) => {
-        content += ` ${k},`
-    })
-
-    content = content.substring(0, content.length - 1) + '\n}\n\n'
-  })
-
-  const structList = require('../config/structDefinitions')
-
-  Object.keys(structList).forEach((key) => {
-    content += `struct ${key} {\n`
-    Object.keys(structList[key]).forEach((k) => {
-        content += `\t${structList[key][k]} ${k}; \n`
-    })
-
-    content += '}\n\n'
-  })
-
-  fs.writeFileSync(solPath, content);
-}
-
 async function dbDeployer() {
   await hre.run('compile',{
     force: true,
@@ -75,7 +45,6 @@ async function crowdfundingDeployer() {
 }
 
 async function deployContracts() {
-  //await initDefinitions()
   const dbAddress = await dbDeployer();
   const crowdfundingAddress = await crowdfundingDeployer();
 

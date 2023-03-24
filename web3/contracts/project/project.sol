@@ -7,11 +7,11 @@ contract Project {
     address internal creator;
     string internal title;
     string internal description;
-    uint internal amountRequired;
-    uint internal amountRaised;
+    uint public amountRequired;
+    uint public amountRaised;
     uint internal startTime;
     uint internal endTime;
-    bool internal isCharity = false;
+    bool public isCharity = false;
 
     ProjectState internal state;
 
@@ -32,8 +32,8 @@ contract Project {
     }
 
     function getProjectDetails() public view 
-        returns(address, string memory, string memory, uint, uint){
-            return (creator, title, description, amountRequired, amountRaised);
+        returns(address, string memory, string memory, uint, uint, ProjectState, bool){
+            return (creator, title, description, amountRequired, amountRaised, state, isCharity);
         }
     
     function changeState(ProjectState _state) internal {

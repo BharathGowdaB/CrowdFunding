@@ -1,24 +1,22 @@
 const { ethers  } = require("hardhat");
 const { expect } = require("chai");
-const deployer = require("../utils/deployer")
-const {verificationState, VerificationState} = require("../config/enumDefinitions")
+const {VerificationState, deployContract, starterDetails} = require('./util.js')
 
 let app ;
 let db ;
+let Starter;
 
 before(async () => {
-  const { dbAddress, crowdfundingAddress} = await deployer.deployContracts()
-  app = await (await ethers.getContractFactory('Crowdfunding')).attach(crowdfundingAddress);
-  db = await (await ethers.getContractFactory("DatabaseSorter")).attach(dbAddress);
+  constracts = await deployContract();
+  app = constracts.app;
+  db = constracts.db;
+
+  Starter = await ethers.getContractFactory("Starter")
 })
 
 describe("Crowdfunding Contract", async () => {
 
-  const starterDetails = {
-    name: 'Bharath',
-    email: 'bharath@gmail.com',
-    password: '231020',
-  } 
+   
 
   const backerDetails = {
     name: "Girish",
@@ -34,11 +32,11 @@ describe("Crowdfunding Contract", async () => {
       const user = await app.authenticateStarter(starterDetails.email, starterDetails.password);
   
       expect(user).to.match(/^0x[a-fA-F0-9]{40}$/);
-      expect((await db.getStarterList(0))[0][0]).to.equals(user)
+      expect((await db.getStarterList({skip: 0}))[0][0]).to.equals(user)
     });
 
     it("Should Not Create Starter if Email Registered", async() => {
-      const user =  app.createStarter('Yashu', starterDetails.email, '231020')
+      const user =  app.createStarter('Yashu', starterDetails.email, starterDetails.password)
       await expect(user).to.be.reverted
     })
 
@@ -48,15 +46,76 @@ describe("Crowdfunding Contract", async () => {
     })
 
     it("Should Not Authenticate Invalid Credientials: Email", async() => {
-      const user = app.authenticateStarter('Yashu@gmail.com', starterDetails.password);
+      const user = app.authenticateStarter('testInvalidEmail@gmail.com', starterDetails.password);
       await expect(user).to.be.reverted
     })
 
     it("Should Not Authenticate Invalid Credientials: Password", async() => {
-      const user = app.authenticateStarter(starterDetails.email, '00');
+      const user = app.authenticateStarter(starterDetails.email, starterDetails.password + '1');
       await expect(user).to.be.reverted
     })
 
+    it('Should Create New Charity Project if Starter Verified', async() => {
+      await app.createStarter(starterDetails.name, 'testStarterCreateCharity@gmail.com', starterDetails.password);
+  
+      const user = await app.authenticateStarter('testStarterCreateCharity@gmail.com',  starterDetails.password);
+      await app.verifyStarter(user, VerificationState.verified)
+
+      const charity = {
+        title : 'Charity101',
+        description : 'testing',
+        amountRequired : 100,
+        fundingDuration : 60 * 60 * 1000 + 1
+      }
+      const [projects, count] = await db.getProjectList({skip: 0})
+      const currentProjectsCount = parseInt(count)
+  
+      const tx = await Starter.attach(user).createProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true)
+      
+      expect(parseInt((await db.getProjectList({skip: 0}))[1])).to.equals(currentProjectsCount + 1)
+      
+    })
+  
+    it('Should Create New Startup Project if Starter Verified', async() => {
+      await app.createStarter(starterDetails.name, 'testStarterCreateStartup@gmail.com', starterDetails.password);
+  
+      const user = await app.authenticateStarter('testStarterCreateStartup@gmail.com',  starterDetails.password);
+      await app.verifyStarter(user, VerificationState.verified)
+
+      const startup = {
+        title : 'Startup',
+        description : 'testing',
+        amountRequired : 100,
+        fundingDuration : 60 * 60 * 1000 + 1
+      }
+      const [projects, count] = await db.getProjectList({skip: 0})
+      const currentProjectsCount = parseInt(count)
+  
+      const tx = await (await Starter.attach(user)).createProject(startup.title , startup.description, startup.amountRequired, startup.fundingDuration, true)
+      
+      expect(parseInt((await db.getProjectList({skip: 0}))[1])).to.equals(currentProjectsCount + 1)
+      
+    })
+
+    it('Should Not be able to create new Project if Starter not Verified', async() => {
+      await app.createStarter(starterDetails.name, 'testStarterNotVerifiedProject@gmail.com', starterDetails.password);
+  
+      const user = await app.authenticateStarter('testStarterNotVerifiedProject@gmail.com',  starterDetails.password);
+      
+      const startup = {
+        title : 'Startup',
+        description : 'testing',
+        amountRequired : 100,
+        fundingDuration : 60 * 60 * 1000 + 1
+      }
+      const [projects, count] = await db.getProjectList({skip: 0})
+      const currentProjectsCount = parseInt(count)
+  
+      const tx =   Starter.attach(user).createProject(startup.title , startup.description, startup.amountRequired, startup.fundingDuration, true)
+      
+      await expect(tx).to.be.reverted
+      
+    })
   })
 
   describe("Verification:", async() => {
@@ -86,6 +145,7 @@ describe("Crowdfunding Contract", async () => {
 
     it("Should Starter be Verified on successful Verification", async () => {
       const user = app.authenticateStarter(starterDetails.email, starterDetails.password);
+      
       await app.verifyStarter(user, VerificationState.verified)
       
       const verifiedState = await app.checkStarterVerified(user)
@@ -94,6 +154,7 @@ describe("Crowdfunding Contract", async () => {
 
     it("Should Not Starter be Verified on unsuccessful Verification", async () => {
       const user = app.authenticateStarter(starterDetails.email, starterDetails.password);
+      
       await app.verifyStarter(user, VerificationState.failed)
       
       const verifiedState = await app.checkStarterVerified(user)

@@ -29,6 +29,12 @@ module.exports = {
     },
     
   },
+  paths: {
+    sources: "./test",
+    tests: "./test",
+    cache: "./cache",
+    artifacts: "./artifacts"
+  },
 
 
 };
