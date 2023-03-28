@@ -41,7 +41,12 @@ contract Project {
     }
 
     function addBacker(address _backerAddress) public payable {
-        // your logic
+        require(state == ProjectState.inFunding, "This project is no longer accepting backers.");
+        require(block.timestamp < endTime, "The deadline for supporting this project has passed.");
+        require(amountRaised < amountRequired, "Funding target reached");
+        require(msg.value > 0, "Amount sent is zero");
+        amountRaised += msg.value;
+        backers[_backerAddress] += msg.value;
     }
 
 }
