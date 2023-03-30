@@ -54,6 +54,7 @@ contract Crowdfunding{
             return backerList[_email].authenticate(msg.sender, _email, _password);
         }
 
+    
     function documentVerification(string memory _email, string memory _password, AttestData memory _kycData) public 
         {
             require(starterList[_email] != Starter(address(0)), "405");

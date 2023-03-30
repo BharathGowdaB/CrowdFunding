@@ -9,11 +9,12 @@ contract Backer is User{
         User(_address, _name, _email, _password){}
     
     
-    function fundProject(address _projectAddress) public 
+    function fundProject(address _projectAddress) public payable
         {
             require(id == msg.sender, "UnAuthorized");
 
             // your logic
+            //Project(_projectAddress).addBacker();
         }
 
 }

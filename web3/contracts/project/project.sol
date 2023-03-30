@@ -27,7 +27,7 @@ contract Project {
         amountRaised = 0;
         amountRequired = _amountRequired;
         endTime = startTime + _fundingDuration;
-        changeState(ProjectState.initial);
+        changeState(ProjectState.inFunding);
         isCharity = _isCharity;
     }
 
@@ -40,9 +40,6 @@ contract Project {
         state = _state;
     }
 
-    function addBacker(address _backerAddress) public payable {
-        // your logic
-    }
 
 }
 
