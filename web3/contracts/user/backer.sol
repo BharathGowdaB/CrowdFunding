@@ -2,6 +2,7 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import { User } from './user.sol';
+import { Project } from '../project/project.sol';
 
 contract Backer is User{
 
@@ -11,10 +12,16 @@ contract Backer is User{
     
     function fundProject(address _projectAddress) public payable
         {
-            require(id == msg.sender, "UnAuthorized");
+            require(id == msg.sender, "401");            
+            Project(_projectAddress).addBacker{value: msg.value}();
 
-            // your logic
-            //Project(_projectAddress).addBacker();
+            for(uint i = 0 ; i < projectList.length ; i++){
+                if(projectList[i] == _projectAddress){
+                    return;
+                }
+            }
+
+            projectList.push(_projectAddress);
         }
 
 }

@@ -2,6 +2,8 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import { maxGetProjectList} from '../utils/constants.sol';
+import { SortData } from '../utils/definitions.sol';
+
 
 contract User{
     address public id;
@@ -30,17 +32,23 @@ contract User{
         return (name, string(email), projectList.length);
     }
 
-    function getProjectList(uint _skip) public view 
-        returns(address[] memory) {
-            assert(_skip <= projectList.length);
-    
-            uint length = (_skip + maxGetProjectList <= projectList.length) ? maxGetProjectList : (projectList.length - _skip);
-            address[] memory list = new address[](length);
+    function getProjectList(SortData memory _sorter) public view returns(address[] memory, uint)
+    {
+        assert(_sorter.skip <= projectList.length);
+        uint start = _sorter.skip;
+        uint end;
 
-            for(uint i = 0 ; i < length ; i++ ){
-                list[i] = projectList[i + _skip];
-            }
-        
-            return list;
+        end = (start + maxGetProjectList);
+
+        if(end > projectList.length) end = projectList.length;
+
+        address[] memory list = new address[](end - _sorter.skip);
+
+        for(uint i = start ; i < end ; i++ ){
+            list[i - start] = projectList[i];
         }
+
+        return (list, projectList.length);
+  }
+
 }

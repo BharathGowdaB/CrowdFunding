@@ -41,15 +41,15 @@ contract Database {
 
 contract DatabaseSorter is Database {
 
-  function getListItems(address[] memory _array, uint _count, uint _maxLimit,SortData memory _sorter) internal view 
+  function getListItems(address[] memory _array, uint _count, uint _maxLimit, SortData memory _sorter) internal view 
   returns(address[] memory, uint)
   {
     assert(_sorter.skip <= _count);
-    uint start;
     uint end;
-
+    uint start ;
     start = _sorter.skip;
-    end = (start +_maxLimit);
+
+    end = (start + _maxLimit);
 
     if(end > _count) end = _count;
 

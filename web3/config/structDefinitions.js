@@ -16,5 +16,6 @@ module.exports = {
     onlyCharity: 'bool', // only Charity
     onlyStartup: 'bool', // Only startup
   }
+
   
 }
