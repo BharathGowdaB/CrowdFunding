@@ -101,7 +101,7 @@ describe("Crowdfunding Contract", async () => {
       await app.createStarter(starterDetails.name, 'testStarterNotVerifiedProject@gmail.com', starterDetails.password);
   
       const user = await app.authenticateStarter('testStarterNotVerifiedProject@gmail.com',  starterDetails.password);
-      
+
       const startup = {
         title : 'Startup',
         description : 'testing',

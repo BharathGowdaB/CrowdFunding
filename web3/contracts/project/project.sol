@@ -27,7 +27,7 @@ contract Project {
         amountRaised = 0;
         amountRequired = _amountRequired;
         endTime = startTime + _fundingDuration;
-        changeState(ProjectState.initial);
+        changeState(ProjectState.inFunding);
         isCharity = _isCharity;
     }
 
@@ -40,14 +40,6 @@ contract Project {
         state = _state;
     }
 
-    function addBacker(address _backerAddress) public payable {
-        require(state == ProjectState.inFunding, "This project is no longer accepting backers.");
-        require(block.timestamp < endTime, "The deadline for supporting this project has passed.");
-        require(amountRaised < amountRequired, "Funding target reached");
-        require(msg.value > 0, "Amount sent is zero");
-        amountRaised += msg.value;
-        backers[_backerAddress] += msg.value;
-    }
 
 }
 

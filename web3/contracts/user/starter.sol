@@ -15,5 +15,6 @@ contract Starter is User{
         {
             require(id == msg.sender, "401");
             projectList.push(Database(dbAddress).addProject(_title, _description, _amountRequired, _fundingDuration, _isCharity));
+
         }
 }
