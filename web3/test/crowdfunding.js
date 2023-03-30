@@ -243,7 +243,7 @@ describe("Crowdfunding Contract", async () => {
       const user = app.authenticateBacker('testBackerFundNullProject@gmail.com', backerDetails.password);
 
       const projectAddress = '0x1111111111111111111111111111111111111111'
-      const fundingAmount =  ethers.utils.parseEther('100');
+      const fundingAmount =  ethers.utils.parseEther('0.000100');
 
       await expect( Backer.attach(user).fundProject(projectAddress, { value: fundingAmount})).to.be.reverted 
     })
