@@ -17,7 +17,7 @@ contract Project {
 
     address[] internal milestones;
     mapping(address => uint) internal backers;
-
+    address[] internal contributors;
     constructor(address _creator, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration, bool _isCharity){
         startTime= block.timestamp;
         require(_fundingDuration > 1 hours, 'Cannot End Project Before Starting');

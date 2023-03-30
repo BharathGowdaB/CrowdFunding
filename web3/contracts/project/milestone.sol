@@ -2,7 +2,7 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import { ProjectState } from '../utils/definitions.sol';
-
+import {Project} from './project.sol';
 contract Milestone {
     // state variables
     address private projectId;
