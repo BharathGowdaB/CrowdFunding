@@ -11,7 +11,7 @@ contract Startup is Project {
     constructor(address _creator, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration)
     Project(_creator, _title, _description , _amountRequired, _fundingDuration, false) { }
 
-    function addBacker() public payable {
+    function addBacker() public override payable {
         require(state == ProjectState.inFunding, "This project is no longer accepting backers.");
         require(block.timestamp < endTime, "The deadline for supporting this project has passed.");
         require((amountRaised + msg.value) <= amountRequired, "Funding Amount Excedes the limit.");

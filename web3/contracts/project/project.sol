@@ -16,7 +16,7 @@ contract Project {
     ProjectState internal state;
 
     address[] internal milestones;
-    mapping(address => uint) internal backers;
+    mapping(address => uint) public backers;
 
     constructor(address _creator, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration, bool _isCharity){
         startTime= block.timestamp;
@@ -40,6 +40,7 @@ contract Project {
         state = _state;
     }
 
+    function addBacker() public virtual payable { }
 
 }
 
