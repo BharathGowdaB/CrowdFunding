@@ -2,16 +2,17 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import { User } from './user.sol';
+
 import { Project } from '../project/project.sol';
+import { Milestone } from '../project/milestone.sol';
 
 contract Backer is User{
 
     constructor(address _address, string memory _name, string memory _email, string memory _password)
         User(_address, _name, _email, _password){}
     
-    
-    function fundProject(address _projectAddress) public payable
-        {
+    function fundProject(address _projectAddress) 
+        public payable {
             require(id == msg.sender, "401");            
             Project(_projectAddress).addBacker{value: msg.value}();
 
@@ -24,4 +25,10 @@ contract Backer is User{
             projectList.push(_projectAddress);
         }
 
+    function voteMilestone(address _milestoneAddress, bool _vote) 
+        public {
+            require(id == msg.sender, '401');
+
+            Milestone(_milestoneAddress).updateVote(_vote);
+        }
 }

@@ -3,27 +3,38 @@ const fs = require('fs');
 const path = require('path');
 
 async function dbDeployer() {
-  await hre.run('compile',{
-    force: true,
-    quiet: true
-  })
-
-  // Contract Deployment --------------------------------------
-  const [owner, otherAccount] = await ethers.getSigners();
-
   const Database = await ethers.getContractFactory("DatabaseSorter");
   const db = await Database.deploy();
 
   await db.deployed();
 
-  dbAddress = db.address;
-  
-  // Saving dbAddress in Solidity file-------------------------------------
-  const solPath =  path.resolve(__dirname , '..', 'contracts' , 'utils' ,'db.address.sol');
+  return db.address;
+}
 
-  fs.writeFileSync(solPath, `//SPDX-License-Identifier: UNLICENSED \npragma solidity >=0.7.0 <0.9.0; \n\naddress constant dbAddress = ${dbAddress} ;`);
+async function lamdaDeployer() {
+  const StartupLamda = await ethers.getContractFactory("StartupLamda");
+  const startupLamda = await StartupLamda.deploy();
 
-  return dbAddress;
+  await startupLamda.deployed();
+
+  const CharityLamda = await ethers.getContractFactory("CharityLamda");
+  const charityLamda = await CharityLamda.deploy();
+
+  await charityLamda.deployed();
+
+  return {
+    startupLamdaAddress : startupLamda.address,
+    charityLamdaAddress : charityLamda.address
+  };
+}
+
+async function validatorDeployer(){
+  const Validator = await ethers.getContractFactory("Validator");
+  const validator = await Validator.deploy();
+
+  await validator.deployed();
+
+  return validator.address;
 }
 
 async function crowdfundingDeployer() {
@@ -33,29 +44,36 @@ async function crowdfundingDeployer() {
   })
   
   // Contract Deployment -----------------------------------
-  const [owner, otherAccount] = await ethers.getSigners();
-
   const App = await ethers.getContractFactory("Crowdfunding");
   const app = await App.deploy();
 
   await app.deployed();
-  crowdfundingAddress = app.address;
 
-  return crowdfundingAddress
+  return app.address;
 }
 
 async function deployContracts() {
+  await hre.run('compile',{
+    force: true,
+    quiet: true
+  })
+
   const dbAddress = await dbDeployer();
+  const {startupLamdaAddress, charityLamdaAddress} = await lamdaDeployer();
+  const validatorAddress = await validatorDeployer();
+
+  // Saving dbAddress in Solidity file-------------------------------------
+  const solPath =  path.resolve(__dirname , '..', 'contracts' , 'utils' ,'address.sol');
+
+  fs.writeFileSync(solPath, `//SPDX-License-Identifier: UNLICENSED \npragma solidity >=0.7.0 <0.9.0; 
+\naddress constant dbAddress = ${dbAddress} ; 
+address constant charityLamdaAddress = ${charityLamdaAddress} ;
+address constant startupLamdaAddress = ${startupLamdaAddress} ;
+address constant validatorAddress = ${validatorAddress} ;`);
+  
   const crowdfundingAddress = await crowdfundingDeployer();
 
-  const size = (await ethers.provider.getCode(dbAddress)).length / 2;
-  console.log("DatababseSorter :", '\n\taddress: ', dbAddress , "\n\tsize: ", size) 
-  
-
-  const size2 = (await ethers.provider.getCode(crowdfundingAddress)).length / 2;
-  console.log("Crowdfunding :", '\n\taddress: ', crowdfundingAddress , "\n\tsize: ", size2,'\n')
-
-  return {dbAddress , crowdfundingAddress}
+  return {dbAddress , crowdfundingAddress, charityLamdaAddress, startupLamdaAddress, validatorAddress}
 }
 
 module.exports = { deployContracts }

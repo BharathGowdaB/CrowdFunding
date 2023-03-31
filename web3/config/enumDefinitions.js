@@ -13,5 +13,13 @@ module.exports = {
     "ended": 3,
     "rejected": 4,
     "aborted": 5
+  },
+
+  MilestoneState: {
+    "initial": 0,
+    "inVoting": 1,
+    "inExecution": 2,
+    "rejected": 3,
+    "ended": 4
   }
 }

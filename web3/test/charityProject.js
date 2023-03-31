@@ -28,7 +28,7 @@ before(async () => {
 })
 
 
-describe("Charity Contract", function () {
+describe("Charity Contract:", function () {
   it("Should Project be Charity Project", async () => {
     expect(await Charity.attach(charityAddress).isCharity()).equals(true);
   })

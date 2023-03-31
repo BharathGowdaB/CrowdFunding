@@ -20,11 +20,14 @@ async function deployContract() {
     constList.maxGetProjectList.value = constants.maxGetProjectList
     await initConstants(constList)
 
-    const { dbAddress, crowdfundingAddress} = await deployer.deployContracts()
+    const {dbAddress , crowdfundingAddress, charityLamdaAddress, startupLamdaAddress, validatorAddress} = await deployer.deployContracts()
     app = await (await ethers.getContractFactory('Crowdfunding')).attach(crowdfundingAddress);
     db = await (await ethers.getContractFactory("DatabaseSorter")).attach(dbAddress);
+    charityLamda = await (await ethers.getContractFactory("CharityLamda")).attach(charityLamdaAddress);
+    startupLamda = await (await ethers.getContractFactory("StartupLamda")).attach(startupLamdaAddress);
+    validator = await (await ethers.getContractFactory("Validator")).attach(validatorAddress);
 
-    return {app, db}
+    return {app, db, charityLamda, startupLamda, validator}
 }
 
 async function createProjects(starterAddress, n, isCharity = false) {
@@ -50,7 +53,13 @@ module.exports = {
     starterDetails : {
         name: 'Bharath',
         email: 'bharath@gmail.com',
-        password: '231020',
+        password: '231020@Bb',
+    },
+    backerDetails : {
+        name: "Girish",
+        email: "giri@gmail.com",
+        password: "231020@Bb"
     }
+
 }
 

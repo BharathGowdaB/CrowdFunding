@@ -13,20 +13,23 @@ async function deploy() {
     const constList = require('../config/constants.js')
     await initConstants(constList)
 
-    const {dbAddress, crowdfundingAddress} = await deployer.deployContracts()
+    const {dbAddress , crowdfundingAddress, charityLamdaAddress, startupLamdaAddress, validatorAddress} = await deployer.deployContracts()
 
     const filePath = path.resolve(__dirname , '..', 'config' , 'contractAddress.json');
     const content = fs.readFileSync(filePath)
     let json = JSON.parse(content)
   
     json['dbAddress'] = dbAddress
+    json['charityLamdaAddress'] = charityLamdaAddress
+    json['startupLamdaAddress'] = startupLamdaAddress
+    json['validatorAddress'] = validatorAddress
     json['crowdfundingAddress'] = crowdfundingAddress;
   
     let newContent = JSON.stringify(json)
   
     fs.writeFileSync(filePath, newContent);
 
-    //console.log("MyContract deployed to:", '\nDatabase : ', dbAddress , '\nCrowdfunding : ', crowdfundingAddress);
+    console.log('Contracts: \n',json)
 };
 
 deploy().catch(err => {

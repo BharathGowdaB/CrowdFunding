@@ -2,34 +2,54 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import { Project } from './project.sol';
+
 import { User } from '../user/user.sol';
+
 import { ProjectState } from '../utils/definitions.sol';
 
+
 contract Charity is Project {
-    constructor(address _creator, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration)
-    Project(_creator, _title, _description , _amountRequired, _fundingDuration, true) { }
+    
+    constructor(address _starterId, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration)
+        Project(_starterId, _title, _description , _amountRequired, _fundingDuration, true) { }
 
-    function addBacker() public override payable {
-        require(state == ProjectState.inFunding, "This project is no longer accepting backers.");
-        require(block.timestamp < endTime, "The deadline for supporting this project has passed.");
-        require(msg.value > 0, "Amount sent is zero");
-        amountRaised += msg.value;
-        backers[msg.sender] += msg.value;
-    }
+    function addBacker() 
+        public override payable {
+            require(state == ProjectState.inFunding, "442");
+            require(block.timestamp < endTime, "443");
+            require(msg.value > 0, "432");
+            
+            amountRaised += msg.value;
+            backers[msg.sender] += msg.value;
 
-    function releaseFunds() public payable{
-        require(state == ProjectState.inFunding, "Funds have already been released or locked.");
-        require(msg.sender == creator, "Only owner can release funds");
-        require(block.timestamp >= endTime, "Funds cannot be released before the time limit.");
+            for(uint i = 0 ; i < backersList.length ; i++){
+                if(backersList[i] == msg.sender) return;
+            }
 
-        payable(User(msg.sender).id()).transfer(amountRaised);
-        changeState(ProjectState.ended);
-    }
+            backersList.push(msg.sender);
+        }
 
-    function abortProject() public {
-        require(msg.sender == creator, "Only the creator can abort the project.");
-        require(block.timestamp >= startTime && block.timestamp <= endTime, "The project cannot be aborted outside of the time limit.");
-        require(state == ProjectState.inFunding, "The project has already been aborted or completed.");
-        state = ProjectState.aborted;
-    }
+    function releaseFunds() 
+        public {
+            require(id == msg.sender, "444");
+            require(state == ProjectState.inFunding, "441");
+            require(block.timestamp >= endTime, "440");
+
+            payable(id).transfer(amountRaised);
+            state = ProjectState.ended;
+        }
+
+    function abortProject() 
+        public {
+            require(id == msg.sender, "401");
+            require(state == ProjectState.inFunding, "445");
+
+            for(uint i = 0 ; i < backersList.length ; i++){
+                (bool sent,) = payable(User(backersList[i]).id()).call{value : backers[backersList[i]]}("");
+                require(sent == true, '500');
+                backers[backersList[i]] = 0;
+            }
+
+            state = ProjectState.aborted;
+        }
 }

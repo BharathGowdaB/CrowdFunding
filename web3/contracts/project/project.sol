@@ -1,44 +1,57 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.7.0 <0.9.0;
 
+import { User } from '../user/user.sol';
+
 import { ProjectState } from '../utils/definitions.sol';
+import { minFundingPeriod } from '../utils/constants.sol';
 
 contract Project {
-    address internal creator;
-    string internal title;
-    string internal description;
-    uint public amountRequired;
+    address public id;
     uint public amountRaised;
-    uint internal startTime;
-    uint internal endTime;
     bool public isCharity = false;
 
+    address internal starterId;
+    string internal title;
+    string internal description;
+    uint internal amountRequired;
+    uint internal startTime;
+    uint internal endTime;
     ProjectState internal state;
 
     address[] internal milestones;
     mapping(address => uint) public backers;
+    address[] internal backersList;
 
-    constructor(address _creator, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration, bool _isCharity){
+    constructor(address _starterId, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration, bool _isCharity){
+        require(_fundingDuration > minFundingPeriod, '431');
+        
         startTime= block.timestamp;
-        require(_fundingDuration > 1 hours, 'Cannot End Project Before Starting');
-        creator = _creator;
+        starterId = _starterId;
+        id = User(_starterId).id();
         title = _title;
         description = _description;
         amountRaised = 0;
         amountRequired = _amountRequired;
         endTime = startTime + _fundingDuration;
-        changeState(ProjectState.inFunding);
+        state = ProjectState.inFunding;
         isCharity = _isCharity;
     }
 
-    function getProjectDetails() public view 
-        returns(address, string memory, string memory, uint, uint, ProjectState, bool){
-            return (creator, title, description, amountRequired, amountRaised, state, isCharity);
+    function getProjectDetails() 
+        public view  returns(address, string memory, string memory, uint, uint, ProjectState, bool) {
+            return (starterId, title, description, amountRequired, amountRaised, state, isCharity);
         }
-    
-    function changeState(ProjectState _state) internal {
-        state = _state;
-    }
+
+    function refundFunds() 
+        public {
+            require(backers[msg.sender] > 0, '415');
+
+            (bool sent,) = payable(User(msg.sender).id()).call{value: backers[msg.sender]}("");
+            require(sent== true, '500');
+
+            backers[msg.sender] = 0;
+        }
 
     function addBacker() public virtual payable { }
 

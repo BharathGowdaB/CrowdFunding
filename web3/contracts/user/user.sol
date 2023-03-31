@@ -19,36 +19,39 @@ contract User{
         password = sha256(bytes.concat(email, bytes(_password))); 
     }
 
-    function authenticate(address _address, string memory _email, string memory _password) public view returns (address) {
-        assert(id == _address);
-        bytes memory _emailBytes = bytes(_email);
-        assert(_emailBytes.length == email.length);
-        assert(password == sha256(bytes.concat(_emailBytes, bytes(_password))));
+    function authenticate(address _address, string memory _email, string memory _password) 
+        public view returns (address) {
+            require(id == _address, "401");
 
-        return address(this);
-    }
+            bytes memory _emailBytes = bytes(_email);
+            require(_emailBytes.length == email.length, '401');
+            require(password == sha256(bytes.concat(_emailBytes, bytes(_password))), '401');
 
-    function getDetails() public view returns(string memory, string memory, uint){
-        return (name, string(email), projectList.length);
-    }
-
-    function getProjectList(SortData memory _sorter) public view returns(address[] memory, uint)
-    {
-        assert(_sorter.skip <= projectList.length);
-        uint start = _sorter.skip;
-        uint end;
-
-        end = (start + maxGetProjectList);
-
-        if(end > projectList.length) end = projectList.length;
-
-        address[] memory list = new address[](end - _sorter.skip);
-
-        for(uint i = start ; i < end ; i++ ){
-            list[i - start] = projectList[i];
+            return address(this);
         }
 
-        return (list, projectList.length);
-  }
+    function getDetails() 
+        public view returns(string memory, string memory, uint) {
+            return (name, string(email), projectList.length);
+        }   
+
+    function getProjectList(SortData memory _sorter) 
+        public view returns(address[] memory, uint) {
+            if(_sorter.skip >= projectList.length) _sorter.skip = projectList.length;
+            uint start = _sorter.skip;
+            uint end;
+
+            end = (start + maxGetProjectList);
+
+            if(end > projectList.length) end = projectList.length;
+
+            address[] memory list = new address[](end - _sorter.skip);
+
+            for(uint i = start ; i < end ; i++ ){
+                list[i - start] = projectList[i];
+            }
+
+            return (list, projectList.length);
+        }
 
 }

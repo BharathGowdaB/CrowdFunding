@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-async function initDefinitions(enumList = {}, structList = {} ){
+function initDefinitions(enumList = {}, structList = {} ){
   const solPath =  path.resolve(__dirname , '..', 'contracts' , 'utils' ,'definitions.sol');
 
   let content = `//SPDX-License-Identifier: UNLICENSED \npragma solidity >=0.7.0 <0.9.0; \n\n`
@@ -9,10 +9,10 @@ async function initDefinitions(enumList = {}, structList = {} ){
   Object.keys(enumList).forEach((key) => {
     content += `enum ${key} {\n\t`
     Object.keys(enumList[key]).forEach((k) => {
-        content += ` ${k},`
+        content += `${k}, `
     })
 
-    content = content.substring(0, content.length - 1) + '\n}\n\n'
+    content = content.substring(0, content.length - 2) + '\n}\n\n'
   })
 
   Object.keys(structList).forEach((key) => {
@@ -27,7 +27,7 @@ async function initDefinitions(enumList = {}, structList = {} ){
   fs.writeFileSync(solPath, content);
 }
 
-async function initConstants(constList){
+function initConstants(constList){
   const solPath =  path.resolve(__dirname , '..', 'contracts' , 'utils' ,'constants.sol');
 
   let content = `//SPDX-License-Identifier: UNLICENSED \npragma solidity >=0.7.0 <0.9.0; \n\n`
