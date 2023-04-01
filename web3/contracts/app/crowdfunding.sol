@@ -19,9 +19,9 @@ contract Crowdfunding{
     Database public db;
     address public admin;
 
-    mapping(string => Backer) private backerList;
-    mapping(string => Starter) private starterList;
-    mapping(Starter => VerificationData) private verifiedList;
+    mapping(string => address) private backerList;
+    mapping(string => address) private starterList;
+    mapping(address => VerificationData) private verifiedList;
 
     constructor() {
         admin = msg.sender;
@@ -33,56 +33,57 @@ contract Crowdfunding{
     }
     
     function createStarter(string memory name, string memory _email, string memory _password) 
-        public returns(Starter) {
+        public returns(address) {
             require(Validator(validatorAddress).isEmail(_email), '420');
             require(Validator(validatorAddress).isPassword(_password), '421');
             require(Validator(validatorAddress).isTitle(name), '422');
             
-            require(starterList[_email] == Starter(address(0)), "402");
+            require(starterList[_email] == address(0), "402");
 
-            starterList[_email] = new Starter(msg.sender, name, _email, _password);
-            db.addStarter(address(starterList[_email]));
+            starterList[_email] = address(new Starter(msg.sender, name, _email, _password));
+            db.addStarter(starterList[_email]);
 
             return starterList[_email];
         }   
 
     function authenticateStarter(string memory _email, string memory _password) 
         public view  returns(address) {
-            require(starterList[_email] != Starter(address(0)), "403");
-            return starterList[_email].authenticate(msg.sender, _email, _password);
+            require(starterList[_email] != address(0), "403");
+            return Starter(starterList[_email]).authenticate(msg.sender, _email, _password);
         }
     
     function createBacker(string memory name, string memory _email, string memory _password) 
-        public returns(Backer) {
+        public returns(address) {
             require(Validator(validatorAddress).isEmail(_email), '420');
             require(Validator(validatorAddress).isPassword(_password), '421');
             require(Validator(validatorAddress).isTitle(name), '422');
 
-            require(backerList[_email] == Backer(address(0)), "402");
+            require(backerList[_email] == address(0), "402");
 
-            backerList[_email] = new Backer(msg.sender, name, _email, _password);
+            backerList[_email] = address(new Backer(msg.sender, name, _email, _password));
 
             return backerList[_email];
         }
 
     function authenticateBacker(string memory _email, string memory _password) 
         public view  returns(address) {
-            require(backerList[_email] != Backer(address(0)), "403");
-            return backerList[_email].authenticate(msg.sender, _email, _password);
+            require(backerList[_email] != address(0), "403");
+            return Backer(backerList[_email]).authenticate(msg.sender, _email, _password);
         }
 
     
     function documentVerification(string memory _email, string memory _password, AttestData memory _kycData) 
         public {
-            require(starterList[_email] != Starter(address(0)), "403");
+            require(starterList[_email] != address(0), "403");
+            require(starterList[_email] == Starter(starterList[_email]).authenticate(msg.sender, _email, _password), '401');
             require((block.timestamp - verifiedList[starterList[_email]].lastUpdate) > minUpdateGap, "430");
             require(verifiedList[starterList[_email]].state != VerificationState.verified, "411");
 
             verifiedList[starterList[_email]] = VerificationData(block.timestamp , _kycData, VerificationState.inProgress);
-            emit VerifyUser(starterList[_email].authenticate(msg.sender, _email, _password));
+            emit VerifyUser(starterList[_email]);
         }
 
-    function verifyStarter(Starter _starter, VerificationState _state) 
+    function verifyStarter(address _starter, VerificationState _state) 
         public {
             require(admin == msg.sender, "401");
             verifiedList[_starter].lastUpdate = block.timestamp;
@@ -91,7 +92,7 @@ contract Crowdfunding{
 
     function checkStarterVerified(address _starter) 
         public view  returns(VerificationState) {
-            return verifiedList[Starter(_starter)].state;
+            return verifiedList[_starter].state;
         }
     
 }

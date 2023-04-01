@@ -8,10 +8,11 @@ import { minFundingPeriod } from '../utils/constants.sol';
 
 contract Project {
     address public id;
+    address public starterId;
     uint public amountRaised;
     bool public isCharity = false;
 
-    address internal starterId;
+    
     string internal title;
     string internal description;
     uint internal amountRequired;
@@ -37,7 +38,7 @@ contract Project {
         state = ProjectState.inFunding;
         isCharity = _isCharity;
     }
-
+    
     function getProjectDetails() 
         public view  returns(address, string memory, string memory, uint, uint, ProjectState, bool) {
             return (starterId, title, description, amountRequired, amountRaised, state, isCharity);
@@ -45,6 +46,7 @@ contract Project {
 
     function refundFunds() 
         public {
+            require(state == ProjectState.inFunding, "441");
             require(backers[msg.sender] > 0, '415');
 
             (bool sent,) = payable(User(msg.sender).id()).call{value: backers[msg.sender]}("");

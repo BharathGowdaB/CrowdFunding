@@ -3,12 +3,13 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import { Database } from './db.sol';
 import { Crowdfunding } from './crowdfunding.sol';
+import { Validator } from './validator.sol';
 
 import { Charity } from '../project/charity.sol';
 import { Startup } from '../project/startup.sol';
 
 import { VerificationState } from '../utils/definitions.sol';
-
+import { validatorAddress } from '../utils/address.sol';
 
 contract CharityLamda{
 
@@ -26,6 +27,7 @@ contract CharityLamda{
 
     function createProject(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration) 
         public returns(address) {
+            require(Validator(validatorAddress).isTitle(_title), '422');
             require(dbAddress != address(0), '601');
             require(Crowdfunding(admin).checkStarterVerified(msg.sender) == VerificationState.verified, "410");
         
@@ -53,6 +55,7 @@ contract StartupLamda{
 
     function createProject(string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration) 
         public returns(address) {
+            require(Validator(validatorAddress).isTitle(_title), '422');
             require(dbAddress != address(0), '601');
             require(Crowdfunding(admin).checkStarterVerified(msg.sender) == VerificationState.verified, "410");
 

@@ -33,3 +33,9 @@ struct SortData {
 	bool onlyStartup; 
 }
 
+struct LogMessage {
+	address id; 
+	string body; 
+	uint timpstamp; 
+}
+

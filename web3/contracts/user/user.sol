@@ -33,7 +33,8 @@ contract User{
     function getDetails() 
         public view returns(string memory, string memory, uint) {
             return (name, string(email), projectList.length);
-        }   
+        }  
+
 
     function getProjectList(SortData memory _sorter) 
         public view returns(address[] memory, uint) {

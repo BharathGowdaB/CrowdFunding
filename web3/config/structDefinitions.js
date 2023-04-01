@@ -15,6 +15,11 @@ module.exports = {
     popular: 'bool', // amountRaised
     onlyCharity: 'bool', // only Charity
     onlyStartup: 'bool', // Only startup
+  },
+  LogMessage: {
+    id : "address",
+    body : "string",
+    timpstamp : "uint"
   }
 
   

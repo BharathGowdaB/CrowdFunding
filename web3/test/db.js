@@ -7,7 +7,7 @@ let app ;
 let db ;
 let Project;
 let Backer;
-
+let starter;
 
 before(async () => {
   constracts = await deployContract();
@@ -18,11 +18,11 @@ before(async () => {
   Backer = await ethers.getContractFactory("Backer")
 
   await app.createStarter(starterDetails.name, 'testGetMaxLimitProject@gmail.com' , starterDetails.password)
-  const user = await app.authenticateStarter('testGetMaxLimitProject@gmail.com' , starterDetails.password)
+  starter = await app.authenticateStarter('testGetMaxLimitProject@gmail.com' , starterDetails.password)
 
-  await app.verifyStarter(user, VerificationState.verified)
+  await app.verifyStarter(starter, VerificationState.verified)
 
-  await createProjects(user, 10)
+  await createProjects(starter, 10)
 })
 
 
@@ -46,7 +46,7 @@ describe('Database Contract:', async() => {
   it('Should Only Retrieve maxLimit no. of Project addresses' , async () => {
     const [list, count] = await db.getProjectList({skip: 0})
     expect(count).equals(10)
-    expect(list.length).equals(constants.maxGetProjectList)
+    expect(list.length).equals(constants.maxGetProjectList.realValue)
   })
 
   it('Should skip first 3 Project addresses while retrival' , async () => {
@@ -129,5 +129,22 @@ describe('Database Contract:', async() => {
 
 
     
+  })
+
+  it("Should Log Messages sent By: Project Creater", async() => {
+    const Starter = await ethers.getContractFactory("Starter")
+    const [list, count] = await Starter.attach(starter).getProjectList({skip: 0})
+
+    const [owner, otheraccounts] = await ethers.getSigners()
+
+    const [log, logCount] = await db.getLogMessage(list[0], 0)
+
+    await db.addLogMessage(list[0], 'Logging Message')
+
+    const [log2, logCount2] = await db.getLogMessage(list[logCount], 0)
+
+    expect(log2.body).equals('Logging Message')
+    expect(log2.id).equals(owner.address)
+
   })
 })

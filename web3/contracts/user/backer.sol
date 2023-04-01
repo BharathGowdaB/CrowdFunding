@@ -3,8 +3,12 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import { User } from './user.sol';
 
+import { Database } from '../app/db.sol';
 import { Project } from '../project/project.sol';
 import { Milestone } from '../project/milestone.sol';
+
+import { dbAddress } from '../utils/address.sol';
+
 
 contract Backer is User{
 
@@ -24,6 +28,11 @@ contract Backer is User{
 
             projectList.push(_projectAddress);
         }
+    
+    function logMessage(address _projectAddress, string memory _body)
+        public {
+            Database(dbAddress).addLogMessage(_projectAddress, _body);
+        } 
 
     function voteMilestone(address _milestoneAddress, bool _vote) 
         public {

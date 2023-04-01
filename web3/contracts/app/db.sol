@@ -7,7 +7,7 @@ import { User } from "../user/user.sol";
 import { Project } from "../project/project.sol";
 
 import { maxGetProjectList, maxGetStarterList } from "../utils/constants.sol";
-import { SortData } from "../utils/definitions.sol";
+import { SortData, LogMessage } from "../utils/definitions.sol";
 
 contract Database {
     address public admin;
@@ -16,6 +16,8 @@ contract Database {
 
     address[] internal starterList;
     address[] internal projectList;
+
+    mapping(address => LogMessage[]) logMessages;
 
     function init(address _charityLamdaAddress, address _startupLamdaAddress)
         public {
@@ -38,6 +40,20 @@ contract Database {
         public {
             require( (msg.sender == charityLamdaAddress || msg.sender == startupLamdaAddress), "401");
             projectList.push(_projectAddress);
+        }
+    
+    function addLogMessage(address _projectAddress, string memory _body)
+        public {
+            require(msg.sender == Project(_projectAddress).id() || Project(_projectAddress).backers(msg.sender) > 0, "401");
+
+            logMessages[_projectAddress].push(LogMessage(msg.sender, _body, block.timestamp));
+        }
+
+    function getLogMessage(address _projectAddress, uint index)
+        public view returns(LogMessage memory, uint){
+            if(logMessages[_projectAddress].length == 0) return (LogMessage(address(0), 'No Logs', block.timestamp ), 0);
+            
+            return (logMessages[_projectAddress][index], logMessages[_projectAddress].length);
         }
 }
 

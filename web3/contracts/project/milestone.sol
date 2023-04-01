@@ -7,19 +7,21 @@ import { Project } from './project.sol';
 import { User } from '../user/user.sol';
 
 contract Milestone {
-    address private projectId;
+    address immutable projectId;
+    uint immutable returnAmount;
     string private title;
     string private description;
     MilestoneState public state;
 
     uint public fundsRequired;
+    
     uint public startTime;
 
     mapping(address => bool) rejectVotes;
     uint private maxVotes;
     uint private cumulativeRejectVotes;
 
-    constructor( string memory _title, string memory _description, uint _fundsRequired,  uint _maxVotes ) {
+    constructor( string memory _title, string memory _description, uint _fundsRequired,  uint _maxVotes, uint _returnAmount ) {
         projectId = msg.sender;
         title = _title;
         description = _description;
@@ -27,7 +29,13 @@ contract Milestone {
         maxVotes = _maxVotes;
         state = MilestoneState.inVoting;
         cumulativeRejectVotes = 0;
+        returnAmount = _returnAmount;
     }
+
+    function getReturnAmount() 
+        public view returns(uint) {
+            return returnAmount;
+        }
 
     function updateVote(bool _vote) 
         public {

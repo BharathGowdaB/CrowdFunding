@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED 
 pragma solidity >=0.7.0 <0.9.0; 
 
-address constant dbAddress = 0x68B1D87F95878fE05B998F19b66F4baba5De1aed ; 
-address constant charityLamdaAddress = 0xc6e7DF5E7b4f2A278906862b61205850344D4e7d ;
-address constant startupLamdaAddress = 0x3Aa5ebB10DC797CAC828524e59A333d0A371443c ;
-address constant validatorAddress = 0x59b670e9fA9D0A427751Af201D676719a970857b ;
+address constant dbAddress = 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707 ; 
+address constant charityLamdaAddress = 0xa513E6E4b8f2a923D98304ec87F64353C4D5C853 ;
+address constant startupLamdaAddress = 0x0165878A594ca255338adfa4d48449f69242Eb8F ;
+address constant validatorAddress = 0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6 ;

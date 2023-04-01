@@ -4,9 +4,9 @@ const deployer = require("../utils/contractDeployer")
 const { VerificationState} = require("../config/enumDefinitions")
 const { initConstants , initDefinitions} = require('../utils/configInitializer.js')
 
-const constants = {
-    maxGetProjectList : 4
-}
+const constants = require('../config/constants');
+constants.maxGetProjectList.value = '4'
+constants.maxGetProjectList.realValue = 4
 
 let app;
 let db;
@@ -16,9 +16,8 @@ async function deployContract() {
     const structList = require('../config/structDefinitions.js')
     await initDefinitions(enumList, structList)
 
-    const constList = require('../config/constants.js')
-    constList.maxGetProjectList.value = constants.maxGetProjectList
-    await initConstants(constList)
+
+    await initConstants(constants)
 
     const {dbAddress , crowdfundingAddress, charityLamdaAddress, startupLamdaAddress, validatorAddress} = await deployer.deployContracts()
     app = await (await ethers.getContractFactory('Crowdfunding')).attach(crowdfundingAddress);
@@ -32,11 +31,12 @@ async function deployContract() {
 
 async function createProjects(starterAddress, n, isCharity = false) {
     const Starter = await ethers.getContractFactory('Starter')
+
     const project = {
         title : 'Startup',
         description : 'testing',
-        amountRequired : 100,
-        fundingDuration : 60 * 60 * 1000 + 1,
+        amountRequired : constants.fundingDenomination.realValue * 10,
+        fundingDuration : constants.minFundingPeriod.realValue + 10,
         isCharity 
       }
     for (i = 0 ; i < n ; i++){
