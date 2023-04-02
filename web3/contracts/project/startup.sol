@@ -6,8 +6,8 @@ import { Milestone } from './milestone.sol';
 
 import { User } from '../user/user.sol';
 
-import { ProjectState, MilestoneState, SortData } from '../utils/definitions.sol';
-import { votingPeriod, maxGetMilestoneList, fundingDenomination} from '../utils/constants.sol';
+import { ProjectState, MilestoneState} from '../utils/definitions.sol';
+import { votingPeriod, fundingDenomination} from '../utils/constants.sol';
 
 
 contract Startup is Project {
@@ -27,7 +27,7 @@ contract Startup is Project {
         public override payable {
             require(state == ProjectState.inFunding, "442");
             require(block.timestamp < endTime, "443");
-            require(msg.value % fundingDenomination == 0, "432");
+            require(msg.value % fundingDenomination == 0 && msg.value > 0, "432");
             require((amountRaised + msg.value) <= amountRequired, "446");
             
             amountRaised += msg.value;
@@ -47,24 +47,10 @@ contract Startup is Project {
             return (milestoneList[milestoneList.length - 1]);
         }
 
-    function getMilestoneList(SortData memory _sorter) 
-        public view returns(address[] memory, uint) {
-            if(_sorter.skip >= milestoneList.length)  _sorter.skip =  milestoneList.length;
-            
-            uint start = _sorter.skip;
-            uint end;
-
-            end = (start + maxGetMilestoneList);
-
-            if(end > milestoneList.length) end = milestoneList.length;
-
-            address[] memory list = new address[](end - _sorter.skip);
-
-            for(uint i = start ; i < end ; i++ ){
-                list[i - start] = milestoneList[i];
-            }
-
-            return (list, milestoneList.length);
+    function getMilestone(uint index) 
+        public view returns(address, uint) {
+            if(milestoneList.length < 0) return (address(0), 0);
+            return (milestoneList[index], milestoneList.length);
         }
 
     function releaseMilestoneFunds(address _milestoneAddress) 
@@ -124,13 +110,13 @@ contract Startup is Project {
             }  
         }
 
-    function endProject(bool _vote)
+    function voteEndProject(bool _vote)
         public {
             require(state == ProjectState.inExecution, "448");
-            require(backers[User(msg.sender).id()] > 0, '401');
-            require(endProjectVotes[User(msg.sender).id()] != _vote, '449');
+            require(backers[msg.sender] > 0, '401');
+            require(endProjectVotes[msg.sender] != _vote, '449');
 
-            endProjectVotes[User(msg.sender).id()] = _vote;
+            endProjectVotes[msg.sender] = _vote;
 
             uint count = 0;
             for(uint i = 0 ; i < backersList.length ; i++) {

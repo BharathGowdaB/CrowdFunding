@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.7.0 <0.9.0;
 
-import { MilestoneState } from '../utils/definitions.sol';
+import { MilestoneState, MilestoneDetails } from '../utils/definitions.sol';
 import { votingPeriod } from '../utils/constants.sol';
 import { Project } from './project.sol';
 import { User } from '../user/user.sol';
@@ -31,6 +31,11 @@ contract Milestone {
         cumulativeRejectVotes = 0;
         returnAmount = _returnAmount;
     }
+    
+    function getMilestoneDetails()
+        public view returns(MilestoneDetails memory) {
+            return MilestoneDetails(title, description, state, returnAmount);
+        }
 
     function getReturnAmount() 
         public view returns(uint) {

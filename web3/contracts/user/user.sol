@@ -1,10 +1,6 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.7.0 <0.9.0;
 
-import { maxGetProjectList} from '../utils/constants.sol';
-import { SortData } from '../utils/definitions.sol';
-
-
 contract User{
     address public id;
     string internal name;
@@ -36,23 +32,10 @@ contract User{
         }  
 
 
-    function getProjectList(SortData memory _sorter) 
-        public view returns(address[] memory, uint) {
-            if(_sorter.skip >= projectList.length) _sorter.skip = projectList.length;
-            uint start = _sorter.skip;
-            uint end;
-
-            end = (start + maxGetProjectList);
-
-            if(end > projectList.length) end = projectList.length;
-
-            address[] memory list = new address[](end - _sorter.skip);
-
-            for(uint i = start ; i < end ; i++ ){
-                list[i - start] = projectList[i];
-            }
-
-            return (list, projectList.length);
+    function getProjectList(uint index) 
+        public view returns(address, uint) {
+            if(projectList.length < 0) return (address(0), 0);
+            return (projectList[index], projectList.length);
         }
 
 }

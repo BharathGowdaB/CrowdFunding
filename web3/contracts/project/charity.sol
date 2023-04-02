@@ -13,21 +13,6 @@ contract Charity is Project {
     constructor(address _starterId, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration)
         Project(_starterId, _title, _description , _amountRequired, _fundingDuration, true) { }
 
-    function addBacker() 
-        public override payable {
-            require(state == ProjectState.inFunding, "442");
-            require(block.timestamp < endTime, "443");
-            require(msg.value > 0, "432");
-            
-            amountRaised += msg.value;
-            backers[msg.sender] += msg.value;
-
-            for(uint i = 0 ; i < backersList.length ; i++){
-                if(backersList[i] == msg.sender) return;
-            }
-
-            backersList.push(msg.sender);
-        }
 
     function releaseFunds() 
         public {
@@ -35,7 +20,7 @@ contract Charity is Project {
             require(state == ProjectState.inFunding, "441");
             require(block.timestamp >= endTime, "440");
 
-            payable(id).transfer(amountRaised);
+            payable(id).transfer(address(this).balance);
             state = ProjectState.ended;
         }
 
@@ -45,6 +30,7 @@ contract Charity is Project {
             require(state == ProjectState.inFunding, "445");
 
             for(uint i = 0 ; i < backersList.length ; i++){
+                if(backers[backersList[i]] == 0) continue;
                 (bool sent,) = payable(User(backersList[i]).id()).call{value : backers[backersList[i]]}("");
                 require(sent == true, '500');
                 backers[backersList[i]] = 0;

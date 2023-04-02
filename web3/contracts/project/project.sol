@@ -22,7 +22,7 @@ contract Project {
 
     address[] internal milestones;
     mapping(address => uint) public backers;
-    address[] internal backersList;
+    address[] public backersList;
 
     constructor(address _starterId, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration, bool _isCharity){
         require(_fundingDuration > minFundingPeriod, '431');
@@ -40,22 +40,38 @@ contract Project {
     }
     
     function getProjectDetails() 
-        public view  returns(address, string memory, string memory, uint, uint, ProjectState, bool) {
-            return (starterId, title, description, amountRequired, amountRaised, state, isCharity);
+        public view  returns(address, string memory, string memory, uint, uint, ProjectState, bool, uint) {
+            return (starterId, title, description, amountRequired, amountRaised, state, isCharity, backersList.length);
         }
 
     function refundFunds() 
         public {
             require(state == ProjectState.inFunding, "441");
+            require(block.timestamp < endTime, "443");
             require(backers[msg.sender] > 0, '415');
 
             (bool sent,) = payable(User(msg.sender).id()).call{value: backers[msg.sender]}("");
             require(sent== true, '500');
 
+            amountRaised -= backers[msg.sender];
             backers[msg.sender] = 0;
         }
 
-    function addBacker() public virtual payable { }
+    function addBacker() 
+        public virtual payable { 
+            require(state == ProjectState.inFunding, "442");
+            require(block.timestamp < endTime, "443");
+            require(msg.value > 0, "432");
+            
+            amountRaised += msg.value;
+            backers[msg.sender] += msg.value;
+
+            for(uint i = 0 ; i < backersList.length ; i++){
+                if(backersList[i] == msg.sender) return;
+            }
+
+            backersList.push(msg.sender);
+        }
 
 }
 

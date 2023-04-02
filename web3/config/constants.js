@@ -31,7 +31,7 @@ module.exports = {
     },
     fundingDenomination: {
         type: 'uint',
-        value: '10',
-        realValue: 10
+        value: '1000',
+        realValue: 1000
     }
 }

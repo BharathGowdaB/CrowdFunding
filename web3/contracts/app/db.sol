@@ -60,7 +60,7 @@ contract Database {
 contract DatabaseSorter is Database {
     
     function getListItems( address[] memory _array, uint _count, uint _maxLimit, SortData memory _sorter) 
-        internal pure returns(address[] memory, uint) {
+        public pure returns(address[] memory, uint) {
             if(_sorter.skip >= _count) _sorter.skip = _count;
             uint end;
             uint start;
@@ -79,13 +79,8 @@ contract DatabaseSorter is Database {
             return (list, _count);
         }
 
-    function getStarterList(SortData memory _sorter)
-        public view returns (address[] memory, uint) {
-              return getListItems( starterList, starterList.length, maxGetStarterList, _sorter );
-        }
-
-    function getSortedProjects(SortData memory _sorter)
-        internal view returns(address[] memory, uint) {
+    function getSortedProjects(address[] memory projectList, SortData memory _sorter)
+        public view returns(address[] memory, uint) {
             if (_sorter.noSort) return (projectList, projectList.length);
             
             if (!(_sorter.recent || _sorter.popular || _sorter.onlyCharity ||_sorter.onlyStartup)) return (projectList, projectList.length);
@@ -128,12 +123,18 @@ contract DatabaseSorter is Database {
             return (sortedList, k);
         }
 
+    function getStarterList(SortData memory _sorter)
+        public view returns (address[] memory, uint) {
+              return getListItems( starterList, starterList.length, maxGetStarterList, _sorter );
+        }
+
+    
     function getProjectList(SortData memory _sorter)
         public view returns (address[] memory, uint) {
             address[] memory list;
             uint count;
             
-            (list, count) = getSortedProjects(_sorter);
+            (list, count) = getSortedProjects(projectList, _sorter);
 
             return getListItems(list, count, maxGetProjectList, _sorter);
         }

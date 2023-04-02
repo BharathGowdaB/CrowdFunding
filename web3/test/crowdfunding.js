@@ -260,8 +260,7 @@
   
 //       const tx = await Starter.attach(starter).createProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true)
       
-//       const [list, count ] = await Starter.attach(starter).getProjectList({skip: 0})
-//       const projectAddress = list[0]
+//       const [projectAddress, count ] = await Starter.attach(starter).getProjectList(0)
 
 //       expect(await Project.attach(projectAddress).amountRaised()).equals(0)
     
@@ -270,10 +269,10 @@
 
 //       expect(await Project.attach(projectAddress).amountRaised()).equals(fundingAmount)
 
-//       const [list2, count2] = await Backer.attach(user).getProjectList({skip: 0})
+//       const [fundedAddress, projectCounts] = await Backer.attach(user).getProjectList(0)
 
-//       expect(list2[0]).equals(projectAddress)
-//       expect(count2).equals(1)
+//       expect(fundedAddress).equals(projectAddress)
+//       expect(projectCounts).equals(1)
     
 //     })
 

@@ -13,3 +13,7 @@ before(async () => {
     console.log("Crowdfunding :", '\n\taddress: ', app.address , "\n\tsize: ", (await ethers.provider.getCode(app.address)).length / 2) 
 
 })
+
+it("Should Return Contract Sizes", async() => {
+
+})

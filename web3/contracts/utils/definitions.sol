@@ -39,3 +39,19 @@ struct LogMessage {
 	uint timpstamp; 
 }
 
+struct MilestoneDetails {
+	string title; 
+	string description; 
+	MilestoneState state; 
+	uint retrunAmount; 
+}
+
+struct ProjectDetails {
+	address starterId; 
+	string title; 
+	string description; 
+	uint amountRequired; 
+	ProjectState state; 
+	uint backersCount; 
+}
+

@@ -7,4 +7,4 @@ uint constant maxGetMilestoneList = 10;
 uint constant maxGetStarterList = 10; 
 uint constant votingPeriod = 24 hours; 
 uint constant minFundingPeriod = 1 hours; 
-uint constant fundingDenomination = 10; 
+uint constant fundingDenomination = 1000; 

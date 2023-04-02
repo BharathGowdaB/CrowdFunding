@@ -59,7 +59,6 @@ async function deployContracts() {
   })
 
   const dbAddress = await dbDeployer();
-  const {startupLamdaAddress, charityLamdaAddress} = await lamdaDeployer();
   const validatorAddress = await validatorDeployer();
 
   // Saving dbAddress in Solidity file-------------------------------------
@@ -67,9 +66,26 @@ async function deployContracts() {
 
   fs.writeFileSync(solPath, `//SPDX-License-Identifier: UNLICENSED \npragma solidity >=0.7.0 <0.9.0; 
 \naddress constant dbAddress = ${dbAddress} ; 
+address constant validatorAddress = ${validatorAddress} ; 
+address constant charityLamdaAddress = ${validatorAddress} ;
+address constant startupLamdaAddress = ${validatorAddress} ;
+`);
+
+  await hre.run('compile',{
+    force: true,
+    quiet: true
+  })
+
+  const {startupLamdaAddress, charityLamdaAddress} =  await lamdaDeployer();
+
+  // Saving dbAddress in Solidity file-------------------------------------
+
+  fs.writeFileSync(solPath, `//SPDX-License-Identifier: UNLICENSED \npragma solidity >=0.7.0 <0.9.0; 
+\naddress constant dbAddress = ${dbAddress} ; 
+address constant validatorAddress = ${validatorAddress} ; 
 address constant charityLamdaAddress = ${charityLamdaAddress} ;
 address constant startupLamdaAddress = ${startupLamdaAddress} ;
-address constant validatorAddress = ${validatorAddress} ;`);
+`);
   
   const crowdfundingAddress = await crowdfundingDeployer();
 

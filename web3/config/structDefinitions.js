@@ -20,6 +20,23 @@ module.exports = {
     id : "address",
     body : "string",
     timpstamp : "uint"
+  },
+
+  MilestoneDetails: {
+    title: "string",
+    description: "string",
+    state: "MilestoneState",
+    retrunAmount: "uint"
+  },
+
+  ProjectDetails: {
+    starterId: "address",
+    title: "string",
+    description: "string",
+    amountRequired: "uint",
+    state: "ProjectState",
+    backersCount: "uint"
+
   }
 
   
