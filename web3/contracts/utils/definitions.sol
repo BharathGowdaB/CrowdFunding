@@ -42,8 +42,10 @@ struct LogMessage {
 struct MilestoneDetails {
 	string title; 
 	string description; 
+	uint startTime; 
 	MilestoneState state; 
-	uint retrunAmount; 
+	uint fundsRequired; 
+	uint returnAmount; 
 }
 
 struct ProjectDetails {

@@ -3,7 +3,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import { User } from '../user/user.sol';
 
-import { ProjectState } from '../utils/definitions.sol';
+import { ProjectState , ProjectDetails} from '../utils/definitions.sol';
 import { minFundingPeriod } from '../utils/constants.sol';
 
 contract Project {
@@ -40,9 +40,10 @@ contract Project {
     }
     
     function getProjectDetails() 
-        public view  returns(address, string memory, string memory, uint, uint, ProjectState, bool, uint) {
-            return (starterId, title, description, amountRequired, amountRaised, state, isCharity, backersList.length);
+        public view  returns(ProjectDetails memory) {
+            return ProjectDetails(starterId, title, description, amountRequired , state, backersList.length);
         }
+
 
     function refundFunds() 
         public {

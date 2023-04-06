@@ -13,13 +13,12 @@ contract Milestone {
     string private description;
     MilestoneState public state;
 
-    uint public fundsRequired;
-    
-    uint public startTime;
+    uint private fundsRequired;  
+    uint private startTime;
 
     mapping(address => bool) rejectVotes;
     uint private maxVotes;
-    uint private cumulativeRejectVotes;
+    uint public cumulativeRejectVotes;
 
     constructor( string memory _title, string memory _description, uint _fundsRequired,  uint _maxVotes, uint _returnAmount ) {
         projectId = msg.sender;
@@ -34,12 +33,7 @@ contract Milestone {
     
     function getMilestoneDetails()
         public view returns(MilestoneDetails memory) {
-            return MilestoneDetails(title, description, state, returnAmount);
-        }
-
-    function getReturnAmount() 
-        public view returns(uint) {
-            return returnAmount;
+            return MilestoneDetails(title, description,startTime, state, fundsRequired, returnAmount);
         }
 
     function updateVote(bool _vote) 
