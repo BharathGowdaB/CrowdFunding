@@ -34,7 +34,7 @@ contract User{
 
     function getProjectList(uint index) 
         public view returns(address, uint) {
-            if(projectList.length < 0) return (address(0), 0);
+            if(projectList.length <= 0 || index >= projectList.length) return (address(0), 0);
             return (projectList[index], projectList.length);
         }
 

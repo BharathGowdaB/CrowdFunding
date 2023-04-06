@@ -25,8 +25,11 @@ module.exports = {
   MilestoneDetails: {
     title: "string",
     description: "string",
+    startTime : "uint",
     state: "MilestoneState",
-    retrunAmount: "uint"
+    fundsRequired: "uint",
+    returnAmount: "uint",
+    
   },
 
   ProjectDetails: {

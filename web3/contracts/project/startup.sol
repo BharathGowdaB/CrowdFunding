@@ -6,7 +6,7 @@ import { Milestone } from './milestone.sol';
 
 import { User } from '../user/user.sol';
 
-import { ProjectState, MilestoneState} from '../utils/definitions.sol';
+import { ProjectState, MilestoneState , MilestoneDetails} from '../utils/definitions.sol';
 import { votingPeriod, fundingDenomination} from '../utils/constants.sol';
 
 
@@ -49,18 +49,20 @@ contract Startup is Project {
 
     function getMilestone(uint index) 
         public view returns(address, uint) {
-            if(milestoneList.length < 0) return (address(0), 0);
+            if(milestoneList.length <= 0 || index >= milestoneList.length) return (address(0), 0);
             return (milestoneList[index], milestoneList.length);
         }
 
     function releaseMilestoneFunds(address _milestoneAddress) 
         public onlyCreator {
             Milestone milestone = Milestone(_milestoneAddress);
-            require(milestone.state() == MilestoneState.inVoting, '454');
-            require(block.timestamp > (milestone.startTime() + votingPeriod), '451');
+            MilestoneDetails memory details = milestone.getMilestoneDetails();
+
+            require(details.state == MilestoneState.inVoting, '454');
+            require(block.timestamp > (details.startTime + votingPeriod), '451');
         
-            if(milestone.getVotingResult()){
-                (bool sent,) = payable(id).call{value: milestone.fundsRequired()}("");
+            if(milestone.getVotingResult() && address(this).balance >= details.fundsRequired){
+                (bool sent,) = payable(id).call{value: details.fundsRequired}("");
                 require(sent == true, '500');
                 milestone.changeState(MilestoneState.inExecution);
             }
@@ -72,8 +74,10 @@ contract Startup is Project {
     function endMilestone(address _milestoneAddress)
         public onlyCreator payable{
             Milestone milestone = Milestone(_milestoneAddress);
-            require(milestone.state() == MilestoneState.inExecution, '455');
-            require(milestone.getReturnAmount() == msg.value, "456");
+            MilestoneDetails memory details = milestone.getMilestoneDetails();
+
+            require(details.state == MilestoneState.inExecution, '455');
+            require(details.returnAmount == msg.value, "456");
 
             amountRaised += msg.value;
             milestone.changeState(MilestoneState.ended);
