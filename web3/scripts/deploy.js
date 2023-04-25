@@ -8,10 +8,10 @@ async function deploy() {
     const enumList = require('../config/enumDefinitions.js')
     const structList = require('../config/structDefinitions.js')
    
-    await initDefinitions(enumList, structList)
+    initDefinitions(enumList, structList)
 
     const constList = require('../config/constants.js')
-    await initConstants(constList)
+    initConstants(constList)
 
     const {dbAddress , crowdfundingAddress, charityLamdaAddress, startupLamdaAddress, validatorAddress} = await deployer.deployContracts()
 

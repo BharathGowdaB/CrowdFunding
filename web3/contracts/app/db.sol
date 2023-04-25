@@ -18,6 +18,7 @@ contract Database {
     address[] internal projectList;
 
     mapping(address => LogMessage[]) logMessages;
+    mapping(address => string) imageURL;
 
     function init(address _charityLamdaAddress, address _startupLamdaAddress)
         public {
@@ -40,6 +41,12 @@ contract Database {
         public {
             require( (msg.sender == charityLamdaAddress || msg.sender == startupLamdaAddress), "401");
             projectList.push(_projectAddress);
+        }
+
+    function setProjectImage(address _projectAddress, string memory url)
+        public {
+            require(msg.sender == Project(_projectAddress).starterId() , '401');
+            imageURL[_projectAddress] = url;
         }
     
     function addLogMessage(address _projectAddress, string memory _body)

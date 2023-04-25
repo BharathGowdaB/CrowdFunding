@@ -40,7 +40,7 @@ async function createProjects(starterAddress, n, isCharity = false) {
         isCharity 
       }
     for (i = 0 ; i < n ; i++){
-        await Starter.attach(starterAddress).createProject(i + project.title , project.description, project.amountRequired, project.fundingDuration, project.isCharity )
+        await Starter.attach(starterAddress).createProject(i + project.title , project.description, project.amountRequired, project.fundingDuration, project.isCharity, "test" )
     }
 }
 
