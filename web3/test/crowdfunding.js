@@ -1,7 +1,7 @@
 const { ethers  } = require("hardhat");
 const { expect } = require("chai");
 const {VerificationState, deployContract, starterDetails, backerDetails} = require('./util.js')
-const constants = require('../config/constants');
+const constants = require('../../config/constants');
 
 let app ;
 let db ;

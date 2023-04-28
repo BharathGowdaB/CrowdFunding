@@ -82,11 +82,16 @@ contract Crowdfunding{
             verifiedList[starterList[_email]] = VerificationData(block.timestamp , _kycData, VerificationState.inProgress);
             emit VerifyUser(starterList[_email]);
         }
+    
+    function getVerificationData(address _starter) 
+        public view returns(AttestData memory) {
+            require(msg.sender == admin);
+            return verifiedList[_starter].data;
+        }
 
     function verifyStarter(address _starter, VerificationState _state) 
         public {
             require(admin == msg.sender, "401");
-            verifiedList[_starter].lastUpdate = block.timestamp;
             verifiedList[_starter].state = _state;
         }
 

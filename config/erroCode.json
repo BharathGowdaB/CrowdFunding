@@ -1,0 +1,39 @@
+{
+  "401" : "Unauthorized",
+  "402" : "Email Already Registered",
+  "403" : "Email Not Registered",
+
+  "410" : "Starter Not Verified",
+  "411" : "Starter Already Verified",
+  "416" : "Project Not Funded By Backer",
+
+  "420" : "Email Pattern Error",
+  "421" : "Password Pattern Error",
+  "422" : "Title Pattern Error",
+
+  "430" : "Minimum Verification Cooldown Time: \nRequest after some time",
+  "431" : "Minimum Funding Period Not Satisfied",
+  "432" : "Funding Denomination Not Satisfied",
+ 
+  "440" : "Project In Funding State",
+  "441" : "Project Not In Funding State",
+  "442" : "Project Not Accepting Funds Now",
+  "443" : "The deadline for supporting this project has passed.",
+  "444" : "Only Project Owner Can Release Funds",
+  "445" : "Project Already Aborted or Ended",
+  "446" : "Funding Amount Excedes the limit",
+  "447" : "Project In Execution State",
+  "448" : "Project Not Started (Not In Execution State)",
+  "449" : "Already Voted for Project Change",
+  
+  "451" : "Cannot Release Funds Before Voting Peroid",
+  "452" : "Voting Period Over Cannot Vote Now",
+  "453" : "Backer Cannot Vote, 0 Funded",
+  "454" : "Milestone Not In Voting State",
+  "455" : "Milestone Not In Execution State",
+
+  "500" : "Something Went Wrong: Payable Unsuccessful",
+  "601" : "Contract Not Initialized",
+  "602" : "Contract Already Initalized"
+
+}

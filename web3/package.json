@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "hardhat test",
-    "deploy": "hardhat --network goeth run scripts/deploy.js" 
+    "deploy": "hardhat --network goeth run scripts/deploy.js"
   },
   "author": "",
   "license": "ISC",
