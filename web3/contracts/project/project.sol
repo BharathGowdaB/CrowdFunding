@@ -5,14 +5,13 @@ import { User } from '../user/user.sol';
 
 import { ProjectState , ProjectDetails} from '../utils/definitions.sol';
 import { minFundingPeriod } from '../utils/constants.sol';
-
 contract Project {
+ 
     address public id;
     address public starterId;
     uint public amountRaised;
     bool public isCharity = false;
 
-    
     string internal title;
     string internal description;
     uint internal amountRequired;
@@ -41,7 +40,7 @@ contract Project {
     
     function getProjectDetails() 
         public view  returns(ProjectDetails memory) {
-            return ProjectDetails(starterId, title, description, amountRequired , state, backersList.length);
+            return ProjectDetails( title, description, amountRequired , state, backersList.length, endTime);
         }
 
 

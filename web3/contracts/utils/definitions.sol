@@ -49,11 +49,11 @@ struct MilestoneDetails {
 }
 
 struct ProjectDetails {
-	address starterId; 
 	string title; 
 	string description; 
 	uint amountRequired; 
 	ProjectState state; 
 	uint backersCount; 
+	uint endTime; 
 }
 

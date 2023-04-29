@@ -1,7 +1,7 @@
 const { ethers  } = require("hardhat");
 const { expect } = require("chai");
 const {deployContract, VerificationState, createProjects , constants, starterDetails, backerDetails} = require('./util.js');
-const { ProjectState } = require("../config/enumDefinitions.js");
+const { ProjectState } = require("../../config/enumDefinitions.js");
 
 let app ;
 let db ;

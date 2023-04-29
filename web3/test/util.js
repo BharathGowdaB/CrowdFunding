@@ -1,10 +1,10 @@
 const { ethers  } = require("hardhat");
 const { expect } = require("chai");
 const deployer = require("../utils/contractDeployer")
-const { VerificationState} = require("../config/enumDefinitions")
+const { VerificationState} = require("../../config/enumDefinitions")
 const { initConstants , initDefinitions} = require('../utils/configInitializer.js')
 
-const constants = require('../config/constants');
+const constants = require('../../config/constants');
 constants.maxGetProjectList.value = '4'
 constants.maxGetProjectList.realValue = 4
 
@@ -12,8 +12,8 @@ let app;
 let db;
 
 async function deployContract() {
-    const enumList = require('../config/enumDefinitions.js')
-    const structList = require('../config/structDefinitions.js')
+    const enumList = require('../../config/enumDefinitions.js')
+    const structList = require('../../config/structDefinitions.js')
     await initDefinitions(enumList, structList)
 
 
@@ -40,7 +40,7 @@ async function createProjects(starterAddress, n, isCharity = false) {
         isCharity 
       }
     for (i = 0 ; i < n ; i++){
-        await Starter.attach(starterAddress).createProject(i + project.title , project.description, project.amountRequired, project.fundingDuration, project.isCharity )
+        await Starter.attach(starterAddress).createProject(i + project.title , project.description, project.amountRequired, project.fundingDuration, project.isCharity, "test" )
     }
 }
 

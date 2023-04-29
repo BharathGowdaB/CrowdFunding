@@ -18,6 +18,7 @@ contract Database {
     address[] internal projectList;
 
     mapping(address => LogMessage[]) logMessages;
+    mapping(address => string) imageURL;
 
     function init(address _charityLamdaAddress, address _startupLamdaAddress)
         public {
@@ -40,6 +41,17 @@ contract Database {
         public {
             require( (msg.sender == charityLamdaAddress || msg.sender == startupLamdaAddress), "401");
             projectList.push(_projectAddress);
+        }
+
+    function setProjectImage(address _projectAddress, string memory url)
+        public {
+            require(msg.sender == Project(_projectAddress).starterId() , '401');
+            imageURL[_projectAddress] = url;
+        }
+    
+    function getProjectImage(address _projectAddress)
+        public view returns (string memory){
+            return imageURL[_projectAddress];
         }
     
     function addLogMessage(address _projectAddress, string memory _body)
@@ -100,23 +112,28 @@ contract DatabaseSorter is Database {
                     }
                 }
             } else {
+                for(uint i=0 ; i < projectList.length; i++){
+                    sortedList[i] = projectList[i];
+                }
                 k = projectList.length;
             }
 
             if (_sorter.recent) {
-                for (uint i = 0; i < projectList.length; i++) {
-                    sortedList[projectList.length - i - 1] = projectList[i];
+                for (uint i = 0; i < k / 2; i++) {
+                    address temp = sortedList[i];
+                    sortedList[i] = sortedList[k-i-1];
+                    sortedList[k-i-1] = temp;
                 }
             } else if (_sorter.popular) {
-                for (uint i = 0; i < k; i++) {
-                    uint j;
-                    uint curAmtRaised = Project(projectList[i]).amountRaised();
-                    for (j = i; j > 0; j--) {
-                        if ( curAmtRaised <= Project(sortedList[j - 1]).amountRaised() ) break;
-                        
-                        sortedList[j] = sortedList[j - 1];
+                address temp;
+                for (uint i = 1; i < k; i++) {
+                    for (uint j = 0; j < k - i ; j++) {
+                        if ( Project(sortedList[j]).amountRaised() < Project(sortedList[j+1]).amountRaised() ){
+                            temp = sortedList[j];
+                            sortedList[j] = sortedList[j+1];
+                            sortedList[j+1] = temp;
+                        }
                     }
-                    sortedList[j] = projectList[i];
                 }
             }
 

@@ -11,7 +11,7 @@
   "421" : "Password Pattern Error",
   "422" : "Title Pattern Error",
 
-  "430" : "Minimum Verification Cooldown Not Satisfied",
+  "430" : "Minimum Verification Cooldown Time: \nRequest after some time",
   "431" : "Minimum Funding Period Not Satisfied",
   "432" : "Funding Denomination Not Satisfied",
  

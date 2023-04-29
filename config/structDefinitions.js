@@ -33,13 +33,12 @@ module.exports = {
   },
 
   ProjectDetails: {
-    starterId: "address",
     title: "string",
     description: "string",
     amountRequired: "uint",
     state: "ProjectState",
-    backersCount: "uint"
-
+    backersCount: "uint",
+    endTime : "uint"
   }
 
   

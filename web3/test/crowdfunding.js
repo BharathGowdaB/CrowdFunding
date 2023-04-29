@@ -1,7 +1,7 @@
 const { ethers  } = require("hardhat");
 const { expect } = require("chai");
 const {VerificationState, deployContract, starterDetails, backerDetails} = require('./util.js')
-const constants = require('../config/constants');
+const constants = require('../../config/constants');
 
 let app ;
 let db ;
@@ -90,7 +90,7 @@ describe("Crowdfunding Contract", async () => {
       const [projects, count] = await db.getProjectList({skip: 0})
       const currentProjectsCount = parseInt(count)
   
-      const tx = await Starter.attach(user).createProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true)
+      const tx = await Starter.attach(user).createProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true, "")
       
       expect(parseInt((await db.getProjectList({skip: 0}))[1])).to.equals(currentProjectsCount + 1)
       
@@ -111,7 +111,7 @@ describe("Crowdfunding Contract", async () => {
       const [projects, count] = await db.getProjectList({skip: 0})
       const currentProjectsCount = parseInt(count)
   
-      const tx = await (await Starter.attach(user)).createProject(startup.title , startup.description, startup.amountRequired, startup.fundingDuration, true)
+      const tx = await (await Starter.attach(user)).createProject(startup.title , startup.description, startup.amountRequired, startup.fundingDuration, true, "")
       
       expect(parseInt((await db.getProjectList({skip: 0}))[1])).to.equals(currentProjectsCount + 1)
       
@@ -131,7 +131,7 @@ describe("Crowdfunding Contract", async () => {
       const [projects, count] = await db.getProjectList({skip: 0})
       const currentProjectsCount = parseInt(count)
   
-      const tx =   Starter.attach(user).createProject(startup.title , startup.description, startup.amountRequired, startup.fundingDuration, true)
+      const tx =   Starter.attach(user).createProject(startup.title , startup.description, startup.amountRequired, startup.fundingDuration, true, "")
       
       await expect(tx).to.be.reverted
       
@@ -258,7 +258,7 @@ describe("Crowdfunding Contract", async () => {
         fundingDuration : 60 * 60 * 1000 + 1
       }
   
-      const tx = await Starter.attach(starter).createProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true)
+      const tx = await Starter.attach(starter).createProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true, "")
       
       const [projectAddress, count ] = await Starter.attach(starter).getProjectList(0)
 

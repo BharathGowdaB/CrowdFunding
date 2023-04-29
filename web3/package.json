@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx thirdweb@latest detect",
-    "deploy": "npx thirdweb@latest deploy",
-    "release": "npx thirdweb@latest release"
+    "test": "hardhat test",
+    "deploy": "hardhat --network goeth run scripts/deploy.js"
   },
   "author": "",
   "license": "ISC",
