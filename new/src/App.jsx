@@ -3,6 +3,7 @@ import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 
 import { ethers } from "ethers";
 import User from './User';
+import { Login, Signup } from './pages';
 
 const App = () => {
 
@@ -12,8 +13,8 @@ const App = () => {
   return (
     <div>
       <Routes>
-          <Route path="/login" element={ <div>login page</div>} />
-          <Route path="/signup" element={ <div>Signup page</div>} />
+          <Route path="/login" element={ <Login setBackerAddress={setBackerAddress} setStarterAddress={setStarterAddress}/>} />
+          <Route path="/signup" element={ <Signup />} />
           <Route path="/*" element={<User isStarter={starterAddress ? true : false} userAddress={starterAddress || backerAddress}/>} />
       </Routes>
     </div>
