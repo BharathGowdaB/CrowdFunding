@@ -79,6 +79,7 @@ export const StateContextProvider = ({ children }) => {
   const applyForVerification = async ({ email, password, name, panNumber}) => {
     await crowdfundingContract.documentVerification(email, password, [name, panNumber])
   }
+
   
   return (
     <StateContext.Provider
