@@ -84,8 +84,9 @@ const UserDetails = () => {
         <div className="flex-1 flex  justify-between items-center bg-[#1c1c24] rounded-[12px] w-full p-4 mt-8 mb-4"> 
             <div>
                 <h1 className="flex-1 font-epilogue font-semibold text-[30px] capitalize text-white text-left min-w-[150px]">{userDetails.name}</h1>
-                <h1 className="flex-1 font-epilogue font-[700] text-[16px] italic text-[#b2b3bd] text-left grayscale">{userDetails.email}</h1>
-            </div>
+                <h1 className="flex-1 font-epilogue font-[700] text-[16px] mt-[8px] text-[#b2b3bd] text-left grayscale">Email: {userDetails.email}</h1>
+                <h1 className="flex-1 font-epilogue font-[400] text-[12px] mt-[4px] text-[#b2b3bd] text-left grayscale">Address: {userAddress}</h1>
+           </div>
             {userDetails.verified == 0 && 
                 <div className='flex text-white font-[600] text-[16px] items-center'> 
                     <div className='p-[10px] pl-[8px] min-h-[36px] text-[#b2b3bd]' >Not Verified</div>

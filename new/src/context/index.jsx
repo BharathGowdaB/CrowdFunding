@@ -32,6 +32,20 @@ export const StateContextProvider = ({ children }) => {
       )
   }
 
+  const createUser = async(form)=>{
+    if(form.isStarter)
+      return await crowdfundingContract.createStarter(form.name, form.email, form.password);
+    else
+      return await crowdfundingContract.createBacker(form.name, form.email, form.password); 
+  }
+
+  const authenticatUser = async(form)=>{
+    if(form.isStarter)
+      return await crowdfundingContract.authenticateStarter(form.email, form.password);
+    else
+      return await crowdfundingContract.authenticateBacker(form.email, form.password); 
+  }
+
   const getProjectList = async({skip = 0,recent=false, popular=false, onlyCharity=false, onlyStartup=false}) => {
     const noSort = !(recent || popular || onlyCharity || onlyStartup)
 
@@ -90,7 +104,9 @@ export const StateContextProvider = ({ children }) => {
         getUserDetails,
         getUserProjects,
         checkStarterVerified,
-        applyForVerification
+        applyForVerification,
+        createUser,
+        authenticatUser
       }}
     >
       {children}

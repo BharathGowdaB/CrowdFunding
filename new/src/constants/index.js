@@ -23,7 +23,7 @@ export const navlinks = [
   {
     name: 'dashboard',
     imgUrl: dashboard,
-    link: '/',
+    link: '/home',
   },
   {
     name: 'project',
@@ -33,12 +33,12 @@ export const navlinks = [
   {
     name: 'payment',
     imgUrl: payment,
-    link: '/',
+    link: '/home',
   },
   {
     name: 'withdraw',
     imgUrl: withdraw,
-    link: '/',
+    link: '/home',
   },
   {
     name: 'profile',

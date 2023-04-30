@@ -7,7 +7,7 @@ async function main(){
 
   const provider = new ethers.getDefaultProvider("http://localhost:8545");
 
-  privateKey = '0x0676ec77f4226ae47bc23217a2d4aaf395aa16ea21dc5e329928a32a05fe6f67'
+  privateKey = '0xbfa56c2e23e078aab4dcf73478214004c951db5dc2bfa4c164e641e5c13a1e67'
   const signer = new ethers.Wallet(privateKey, provider);
 
 
@@ -25,6 +25,8 @@ async function main(){
 
   console.log('Verifier Running...')
 
+  //verify single user
+  //await app.verifyStarter('0xDc2cF906a571bcF751857806922d5AD4c5c3D014' , VerificationState.verified)
 }
 
 main()

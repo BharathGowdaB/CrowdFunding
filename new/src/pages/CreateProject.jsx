@@ -38,13 +38,13 @@ const CreateProject = ({ isStarter, userAddress}) => {
     checkIfImage(form.image, async (exists) => {
       if(exists) {
         try {
-          const txn = await createProject(userAddress, { 
+          const tnx = await createProject(userAddress, { 
             ...form, 
             amountRequired: ethers.utils.parseUnits(form.amountRequired, 18),
             fundingDuration: Math.floor(((new Date(form.deadline).getTime() + 86399000)- Date.now()) / 1000)
           });
+          await tnx.wait()
 
-          await txn.wait()
           setLogger({error: false, message: 'Project Created Successfully' , handleClick: function() {
             setIsLogging(false)
           }})
@@ -72,7 +72,7 @@ const CreateProject = ({ isStarter, userAddress}) => {
       {isLoading && <Loader/>}
       {isLogging && <Logger {...logger}/>}
       <div className="flex justify-center items-center p-[16px] sm:min-w-[380px] bg-[#3a3a43] rounded-[10px]">
-        <h1 className="font-epilogue font-bold sm:text-[25px] text-[18px] leading-[38px] text-white">Start a Campaign</h1>
+        <h1 className="font-epilogue font-bold sm:text-[25px] text-[18px] leading-[38px] text-white">Start new Project</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="w-full mt-[65px] flex flex-col gap-[30px]">
@@ -92,9 +92,9 @@ const CreateProject = ({ isStarter, userAddress}) => {
                 onClick={(e) => setForm({ ...form, ['isCharity']: e.target.checked })}
                 type={"checkbox"}
                 step="0.1"
-                className="py-[15px] sm:px-[25px] px-[15px] outline-none border-[1px] border-[#3a3a43] bg-transparent font-epilogue text-white text-[14px] placeholder:text-[#4b5264] rounded-[10px]"
+                className="py-[15px] sm:px-[25px] px-[15px]  outline-none border-[1px] border-[#3a3a43] bg-transparent font-epilogue text-white text-[14px] placeholder:text-[#4b5264] rounded-[10px]"
               />
-              <label className='text-[#808191] p-[12px]'>isCharity: </label>
+              <label className={`text-[#808191] p-[12px] ${form.isCharity && 'text-[#1dc071]'}`} >isCharity: </label>
             </div>
             
           </label>
