@@ -2,20 +2,33 @@ import React, { useState, useEffect } from "react";
 import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 
 import { ethers } from "ethers";
-import User from './User';
-import { Login, Signup } from './pages';
+import { Login, Signup, User } from './pages';
 
 const App = () => {
+  const navigate = useNavigate();
+  const [userAddress, setUserAddress] = useState('')
+  const [isStarter, setIsStarter] = useState(true)
 
-  const [starterAddress, setStarterAddress] = useState("0xbE8E1F900047B83d0212ad562D5E39c68A02DE4d") //ethers.constants.AddressZero)
-  const [backerAddress, setBackerAddress] = useState(ethers.constants.AddressZero)
 
+  useEffect(() => {
+    if(!(userAddress)){
+      const starter = window.sessionStorage.getItem("starterAddress")
+      const backer = window.sessionStorage.getItem("backerAddress")
+      if(!(starter || backer)) navigate('/login')
+      else{
+        setUserAddress(starter || backer)
+        if(starter) setIsStarter(true)
+        else setIsStarter(false)
+      }
+    }
+  },[])
+  
   return (
     <div>
       <Routes>
-          <Route path="/login" element={ <Login setBackerAddress={setBackerAddress} setStarterAddress={setStarterAddress}/>} />
+          <Route path="/login" element={ <Login />} />
           <Route path="/signup" element={ <Signup />} />
-          <Route path="/*" element={<User isStarter={starterAddress ? true : false} userAddress={starterAddress || backerAddress}/>} />
+          <Route path="/*" element={<User isStarter={isStarter} userAddress={userAddress}/>} />
       </Routes>
     </div>
   );

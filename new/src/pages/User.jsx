@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 
-import { Sidebar, Navbar, Loader, Logger } from "./components";
-import { Home, CreateProject, Profile, UserDetails } from "./pages";
+import { Sidebar, Navbar, Loader, Logger } from "../components";
+import { Home, CreateProject, Profile, UserDetails } from "./";
 
-import { useStateContext } from "./context";
+import { useStateContext } from "../context";
 
 const User = ({userAddress, isStarter}) => {
   const context = useStateContext();
@@ -33,7 +33,7 @@ const User = ({userAddress, isStarter}) => {
           <Route path="/create-project" element={<CreateProject  isStarter={isStarter} userAddress={userAddress}/>} />
           <Route path="/profile" element={<Profile isStarter={isStarter} userAddress={userAddress}/>} />
           <Route path="/user/:userAddress" element={<UserDetails />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>

@@ -20,7 +20,7 @@ const Home = () => {
         onlyStartup: false
     })
 
-    const maxObjectPerPage = 2;
+    const maxObjectPerPage = 12;
 
 
     useEffect(() => {

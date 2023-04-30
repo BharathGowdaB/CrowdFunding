@@ -34,9 +34,9 @@ export const StateContextProvider = ({ children }) => {
 
   const createUser = async(form)=>{
     if(form.isStarter)
-      await crowdfundingContract.createStarter(form.name, form.email, form.password);
+      return await crowdfundingContract.createStarter(form.name, form.email, form.password);
     else
-      await crowdfundingContract.createBacker(form.name, form.email, form.password); 
+      return await crowdfundingContract.createBacker(form.name, form.email, form.password); 
   }
 
   const authenticatUser = async(form)=>{

@@ -4,8 +4,10 @@ import { verified, failed, inProgress} from '../assets';
 import { CustomButton, DisplayProjects, Loader, Logger , FormField} from '../components';
 import { useStateContext} from '../context';
 import { ErrorCode } from '../constants';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = ( { isStarter, userAddress}) => {
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [isLogging, setIsLogging] = useState(false)
     const [logger, setLogger] = useState({ on: false, error: false, message: ""});
@@ -61,6 +63,8 @@ const Profile = ( { isStarter, userAddress}) => {
 
     const fetchDetails = async () => {
       try{
+          console.log(userAddress)
+          if(!userAddress) return
           await fetchProjectList();
           const details = await getUserDetails(userAddress)
           const verificationState = await checkStarterVerified(userAddress)
@@ -85,7 +89,7 @@ const Profile = ( { isStarter, userAddress}) => {
 
     useEffect(() => {
       fetchDetails()
-    }, [projectCount])
+    },[userAddress])
 
     
   return (
@@ -95,7 +99,8 @@ const Profile = ( { isStarter, userAddress}) => {
         <div className="flex-1 flex  justify-between items-center bg-[#1c1c24] rounded-[12px] w-full p-4 mt-8 mb-4"> 
             <div>
                 <h1 className="flex-1 font-epilogue font-semibold text-[30px] capitalize text-white text-left min-w-[150px]">{userDetails.name}</h1>
-                <h1 className="flex-1 font-epilogue font-[700] text-[16px] italic text-[#b2b3bd] text-left grayscale">{userDetails.email}</h1>
+                <h1 className="flex-1 font-epilogue font-[700] text-[16px] mt-[8px] text-[#b2b3bd] text-left grayscale">Email: {userDetails.email}</h1>
+                <h1 className="flex-1 font-epilogue font-[400] text-[12px] mt-[4px] text-[#b2b3bd] text-left grayscale">Address: {userAddress}</h1>
             </div>
             <div className='relative'>
               {userDetails.verified == 0 && 
@@ -140,7 +145,7 @@ const Profile = ( { isStarter, userAddress}) => {
                       <FormField 
                         labelName="Password *"
                         placeholder="Password"
-                        inputType="text"
+                        inputType="password"
                         value={form.password}
                         handleChange={(e) => handleFormFieldChange('password', e)}
                       />
