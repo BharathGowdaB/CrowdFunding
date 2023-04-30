@@ -2,3 +2,5 @@ node_modules/
 
 artifacts/
 cache/
+config/contractAddress.json
+web3/contracts/utils/address.sol
