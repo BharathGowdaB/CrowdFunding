@@ -36,11 +36,10 @@ const Navbar = ({ setSearchAddress , searchAddress}) => {
       <div className="sm:flex hidden flex-row justify-end gap-4">
         <CustomButton 
           btnType="button"
-          title={address ? 'Create a project' : 'Connect'}
-          styles={address ? 'bg-[#1dc071]' : 'bg-[#8c6dfd]'}
+          title={'Create a project'}
+          styles={'bg-[#1dc071]'}
           handleClick={() => {
-            if(address) navigate('create-project')
-           // else connect()
+            navigate('create-project')
           }}
         />
 

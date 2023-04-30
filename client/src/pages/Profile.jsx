@@ -103,6 +103,7 @@ const Profile = ( { isStarter, userAddress}) => {
                 <h1 className="flex-1 font-epilogue font-[400] text-[12px] mt-[4px] text-[#b2b3bd] text-left grayscale">Address: {userAddress}</h1>
             </div>
             <div className='relative'>
+  
               {userDetails.verified == 0 && 
                   <div className='flex text-white font-[600] text-[16px] items-center'> 
                       <label htmlFor="start-verification" className='p-[10px] pl-[8px] min-h-[36px] text-[#b2b3bd]' >Not Verified</label>
@@ -124,6 +125,7 @@ const Profile = ( { isStarter, userAddress}) => {
                   </div>}
               
               <input type='checkbox' className='hidden' onChange={(e) => setIsVerificationForm(e.target.checked)} id='start-verification' name="start-verification form"/>
+              {userDetails.verified != 3 &&  <span className='text-[#b2b3bd] text-[12px]'>click for verification</span>}
               {
                 isVerificationForm && 
                   <div className='absolute right-0 p-4 bg-[#1c1c24] border-2 border-[#2c2f32] text-white'>

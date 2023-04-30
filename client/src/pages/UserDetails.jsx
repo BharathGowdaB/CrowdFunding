@@ -65,7 +65,7 @@ const UserDetails = () => {
                 error: false, 
                 message: 'Please Enter a valid User Address', 
                 handleClick : () => {
-                    navigate('/')
+                    navigate('/home')
                     setIsLogging(false)
                 }
             })
