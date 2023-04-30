@@ -8,3 +8,4 @@ export { default as CountBox } from './CountBox';
 export { default as Loader } from './Loader';
 export { default as Logger } from './Logger';
 export { default as Pagination } from './Pagination';
+export { default as ToggleBar } from './ToggleBar';

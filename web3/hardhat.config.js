@@ -12,14 +12,14 @@ module.exports = {
     },
     polyscan: {
       url: 'https://rpc.ankr.com/polygon_mumbai',
-      accounts: [`0x0676ec77f4226ae47bc23217a2d4aaf395aa16ea21dc5e329928a32a05fe6f67`]
+      accounts: [`0x26eac854ee6636f2ec0bcf8b790ba1db05d698872c9a979109a248cd767de401`]
     },
 
     goeth: {
       chainId: 1337,
       url: 'http://127.0.0.1:8545',
       blockGasLimit: 8000000,
-      accounts: [`0x0676ec77f4226ae47bc23217a2d4aaf395aa16ea21dc5e329928a32a05fe6f67`]
+      accounts: [`0xbfa56c2e23e078aab4dcf73478214004c951db5dc2bfa4c164e641e5c13a1e67`]
     }
   },
   settings: {
