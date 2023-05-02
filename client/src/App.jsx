@@ -10,16 +10,16 @@ const App = () => {
   const [isStarter, setIsStarter] = useState(true)
 
 
-  useEffect(() => {
-    if(!(userAddress)){
-      const address = window.sessionStorage.getItem("userAddress")
-      if(!( address )) navigate('/login')
-      else{
-        setUserAddress(address)
-        setIsStarter(window.sessionStorage.getItem("isStarter") == "true")
-      }
-    }
-  },[])
+  // useEffect(() => {
+  //   if(!(userAddress)){
+  //     const address = window.sessionStorage.getItem("userAddress")
+  //     if(!( address )) navigate('/login')
+  //     else{
+  //       setUserAddress(address)
+  //       setIsStarter(window.sessionStorage.getItem("isStarter") == "true")
+  //     }
+  //   }
+  // },[])
   
   return (
     <div>

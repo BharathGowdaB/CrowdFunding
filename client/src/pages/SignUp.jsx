@@ -6,7 +6,7 @@ import { ErrorCode } from "../constants";
 
 import { useStateContext } from "../context";
 
-const Signup = ({ setStarterAddress, setBackerAddress }) => {
+const Signup = () => {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
