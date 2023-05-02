@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 
 import { verified, failed, inProgress,inFunding, tagType, funded} from '../assets';
-import { CustomButton, FormField, Loader, Logger } from "../components";
+import { CustomButton, FormField, Loader, Logger , MilestoneCard} from "../components";
 import { ErrorCode } from "../constants";
 import { daysLeft } from "../utils";
 
