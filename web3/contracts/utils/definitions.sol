@@ -36,7 +36,7 @@ struct SortData {
 struct LogMessage {
 	address id; 
 	string body; 
-	uint timpstamp; 
+	uint timestamp; 
 }
 
 struct MilestoneDetails {

@@ -52,6 +52,12 @@ async function deploy() {
     const projectABI = fs.readFileSync(path.resolve(abiSourcePath, "project", "project.sol", "Project.json"))
     fs.writeFileSync(path.resolve(abiDestinationPath, "project.json"), JSON.stringify(JSON.parse(projectABI).abi))
 
+    const startupABI = fs.readFileSync(path.resolve(abiSourcePath, "project", "startup.sol", "Startup.json"))
+    fs.writeFileSync(path.resolve(abiDestinationPath, "startup.json"), JSON.stringify(JSON.parse(startupABI).abi))
+
+    const charityABI = fs.readFileSync(path.resolve(abiSourcePath, "project", "charity.sol", "Charity.json"))
+    fs.writeFileSync(path.resolve(abiDestinationPath, "charity.json"), JSON.stringify(JSON.parse(charityABI).abi))
+
     const milestoneABI = fs.readFileSync(path.resolve(abiSourcePath, "project", "milestone.sol", "Milestone.json"))
     fs.writeFileSync(path.resolve(abiDestinationPath, "milestone.json"), JSON.stringify(JSON.parse(milestoneABI).abi))
 };

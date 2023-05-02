@@ -4,22 +4,67 @@ import starterABI from "../../../abi/starter.json";
 import databaseABI from "../../../abi/database.json";
 import crowdfundingABI from '../../../abi/crowdfunding.json';
 import projectABI from "../../../abi/project.json";
+import startupABI from "../../../abi/startup.json";
+import charityABI from "../../../abi/charity.json";
 import userABI from "../../../abi/user.json";
+import backerABI from "../../../abi/backer.json";
+import milestoneABI from "../../../abi/milestone.json";
 import errorCode from "../../../config/erroCode.json";
 
 export const Address = {
   ...ContractAddress
 }
 
+
+
 export const ABI = {
   starterABI,
   databaseABI,
   crowdfundingABI,
   projectABI,
-  userABI
+  startupABI,
+  charityABI,
+  userABI,
+  backerABI,
+  milestoneABI
 }
+  
 
-export const navlinks = [
+
+export const starterNavlinks = [
+  {
+    name: 'dashboard',
+    imgUrl: dashboard,
+    link: '/home',
+  },
+  {
+    name: 'create-project',
+    imgUrl: createCampaign,
+    link: '/create-project',
+  },
+  {
+    name: 'project',
+    imgUrl: payment,
+    link: '/project/0',
+  },
+  {
+    name: 'milestone',
+    imgUrl: withdraw,
+    link: '/milestone/0',
+  },
+  {
+    name: 'profile',
+    imgUrl: profile,
+    link: '/profile',
+  },
+  {
+    name: 'logout',
+    imgUrl: logout,
+    link: '/login',
+  },
+];
+
+export const backerNavlinks = [
   {
     name: 'dashboard',
     imgUrl: dashboard,
@@ -27,18 +72,13 @@ export const navlinks = [
   },
   {
     name: 'project',
-    imgUrl: createCampaign,
-    link: '/create-project',
-  },
-  {
-    name: 'payment',
     imgUrl: payment,
-    link: '/home',
+    link: '/project/',
   },
   {
-    name: 'withdraw',
+    name: 'milestone',
     imgUrl: withdraw,
-    link: '/home',
+    link: '/milestone/',
   },
   {
     name: 'profile',

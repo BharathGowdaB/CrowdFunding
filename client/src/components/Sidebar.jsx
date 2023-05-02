@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { logo, sun } from '../assets';
-import { navlinks } from '../constants';
+import { starterNavlinks, backerNavlinks } from '../constants';
 
 import { Logger } from "../components"
 
@@ -16,12 +16,20 @@ const Icon = ({ styles, name, imgUrl, isActive, disabled, handleClick }) => (
   </div>
 )
 
-const Sidebar = () => {
+const Sidebar = ({isStarter}) => {
   const navigate = useNavigate();
 
+  const [navlinks, setNavLinks] = useState([])
   const [isLogging, setIsLogging] = useState(false)
   const [logger, setLogger] = useState({ on: false, error: false, message: ""});
   const [isActive, setIsActive] = useState('dashboard');
+
+  useEffect(() => {
+    if(isStarter)
+      setNavLinks(starterNavlinks)
+    else
+      setNavLinks(backerNavlinks)
+  }, [isStarter])
 
   return (
     <div className="flex justify-between items-center flex-col sticky top-5 h-[93vh]">

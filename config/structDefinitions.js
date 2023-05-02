@@ -19,7 +19,7 @@ module.exports = {
   LogMessage: {
     id : "address",
     body : "string",
-    timpstamp : "uint"
+    timestamp : "uint"
   },
 
   MilestoneDetails: {

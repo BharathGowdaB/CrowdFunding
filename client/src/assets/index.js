@@ -16,6 +16,8 @@ import doubleArrow from './double-arrow.svg';
 import verified from "./verified.png";
 import failed from "./failed.png";
 import inProgress from "./inProgress.png";
+import inFunding from "./inFunding.png";
+import funded from "./funded.png";
 
 export {
   tagType,
@@ -35,5 +37,7 @@ export {
   doubleArrow,
   verified,
   failed,
-  inProgress
+  inProgress,
+  inFunding,
+  funded
 };

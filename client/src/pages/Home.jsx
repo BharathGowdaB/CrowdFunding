@@ -57,6 +57,7 @@ const Home = () => {
             sortBy = {sortBy}
             setSortBy = {setSortBy}
             emptyMessage = {'No Projects found'}
+            clickURL = 'project-details'
         />
         <Pagination
         total={projectCount}

@@ -12,13 +12,11 @@ const App = () => {
 
   useEffect(() => {
     if(!(userAddress)){
-      const starter = window.sessionStorage.getItem("starterAddress")
-      const backer = window.sessionStorage.getItem("backerAddress")
-      if(!(starter || backer)) navigate('/login')
+      const address = window.sessionStorage.getItem("userAddress")
+      if(!( address )) navigate('/login')
       else{
-        setUserAddress(starter || backer)
-        if(starter) setIsStarter(true)
-        else setIsStarter(false)
+        setUserAddress(address)
+        setIsStarter(window.sessionStorage.getItem("isStarter") == "true")
       }
     }
   },[])

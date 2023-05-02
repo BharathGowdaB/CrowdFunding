@@ -1,11 +1,10 @@
 import React, { useContext, createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { ethers } from 'ethers';
-import { Address, ABI , ErrorCode} from '../constants/index';
 
-// Has to change
-Address["starterAddress"] = '0x4c30Aa76180Ea5b52ef6d30de8E5B687d16E920a';
+import milestoneABI from "../../../abi/milestone.json";
+import { ethers } from 'ethers';
+import { Address, ABI , ErrorCode } from '../constants/index';
 
 const StateContext = createContext();
 
@@ -15,8 +14,12 @@ const signer = provider.getSigner();
 const databaseContract = new ethers.Contract(ethers.utils.getAddress(Address.dbAddress), ABI.databaseABI, provider);
 const crowdfundingContract = new ethers.Contract(ethers.utils.getAddress(Address.crowdfundingAddress), ABI.crowdfundingABI, signer);
 const projectContract = new ethers.Contract(ethers.constants.AddressZero, ABI.projectABI, provider);
+const startupContract = new ethers.Contract(ethers.constants.AddressZero, ABI.startupABI, signer);
+const charityContract = new ethers.Contract(ethers.constants.AddressZero, ABI.charityABI, signer);
+const milestoneContract = new ethers.Contract(ethers.constants.AddressZero, milestoneABI, provider);
 const userContract = new ethers.Contract(ethers.constants.AddressZero, ABI.userABI, provider);
 const starterContract = new ethers.Contract(ethers.constants.AddressZero, ABI.starterABI, signer);
+const backerContract = new ethers.Contract(ethers.constants.AddressZero, ABI.backerABI, signer);
 
 export const StateContextProvider = ({ children }) => {
 
@@ -46,6 +49,7 @@ export const StateContextProvider = ({ children }) => {
       return await crowdfundingContract.authenticateBacker(form.email, form.password); 
   }
 
+
   const getProjectList = async({skip = 0,recent=false, popular=false, onlyCharity=false, onlyStartup=false}) => {
     const noSort = !(recent || popular || onlyCharity || onlyStartup)
 
@@ -54,16 +58,34 @@ export const StateContextProvider = ({ children }) => {
 
   const getProjectDetails = async(projectAddress) => {
     const response = await projectContract.attach(projectAddress).getProjectDetails()
+    const amountRaised = await projectContract.attach(projectAddress).amountRaised()
 
     const details = {
       title: response.title,
       description: response.description,
       endTime: parseInt(response.endTime),
+      backersCount: parseInt(response.backersCount),
+      state: parseInt(response.state),
       amountRequired : ethers.utils.formatUnits(response.amountRequired, 18),
-      amountRaised : ethers.utils.formatUnits(await projectContract.attach(projectAddress).amountRaised(), 18),
+      amountRaised : ethers.utils.formatUnits(amountRaised, 18),
       starterId: await projectContract.attach(projectAddress).starterId(),
       isCharity: await projectContract.attach(projectAddress).isCharity(),
       image: await databaseContract.getProjectImage(projectAddress)
+    }
+
+    return details
+  }
+
+  const getMilestoneDetails = async(milestoneAddress) => {
+    const response = await milestoneContract.attach(milestoneAddress).getMilestoneDetails()
+
+    const details = {
+      title: response.title,
+      description: response.description,
+      endTime: parseInt(response.startTime),
+      state: parseInt(response.state),
+      fundsRequired : ethers.utils.formatUnits(response.fundsRequired, 18),
+      returnAmount : ethers.utils.formatUnits(response.returnAmount, 18),
     }
 
     return details
@@ -85,6 +107,17 @@ export const StateContextProvider = ({ children }) => {
     return [list, count]
   }
 
+  const getProjectMilestone = async(projectAddress) => {
+    let list = [];
+    const [milestoneAddress, count] = await startupContract.attach(projectAddress).getMilestone(0)
+
+    for(let i = 0 ; i < count ; i++){
+      list.push((await startupContract.attach(projectAddress).getMilestone(i))[0])
+    }
+
+    return [list, count]
+  }
+
   const checkStarterVerified = async(userAddress) => {
     const isVerified = await crowdfundingContract.checkStarterVerified(userAddress)
     return isVerified
@@ -94,19 +127,71 @@ export const StateContextProvider = ({ children }) => {
     await crowdfundingContract.documentVerification(email, password, [name, panNumber])
   }
 
+  const fundProject = async (userAddress, projectAddress, fundValue) => {
+    return await backerContract.attach(userAddress).fundProject(projectAddress, { value: fundValue});
+  }
+
+  const releaseFunds = async (projectAddress) => {
+    return await charityContract.attach(projectAddress).releaseFunds()
+  }
+
+  const startProject = async (projectAddress) => {
+    return await startupContract.attach(projectAddress).startProject()
+  }
+
+  const abortProject = async (projectAddress , isCharity) => {
+    if(isCharity)
+      return await charityContract.attach(projectAddress).abortProject()
+    else 
+      return await startupContract.attach(projectAddress).abortProject()
+  }
+
+  const refundBackerFunds = async (userAddress, projectAddress) => {
+    return await backerContract.attach(userAddress).returnProjectFunds(projectAddress)
+  }
+
+  const addNewMilestone = async (projectAddress, form) => {
+    return await startupContract.attach(projectAddress).addMilestone(form.title, form.description, form.fundsRequired, form.returnAmount);
+  }
   
+  const addLogMessage = async (userAddress, isStarter, projectAddress, message) => {
+    if(isStarter) return await databaseContract.connect(signer).addLogMessage(projectAddress, message)
+    else return await backerContract.attach(userAddress).logMessage(projectAddress, message)
+  }
+
+  const getLogMessage = async (projectAddress) => {
+    let list = [];
+    const [message, count] = await databaseContract.getLogMessage(projectAddress, 0)
+
+    for(let i = 0 ; i < count ; i++){
+      list.push(( await databaseContract.getLogMessage(projectAddress, i))[0])
+    }
+
+    return [list, count]
+  }
+
   return (
     <StateContext.Provider
       value={{ 
         createProject,
         getProjectList,
         getProjectDetails,
+        getMilestoneDetails,
         getUserDetails,
         getUserProjects,
         checkStarterVerified,
         applyForVerification,
         createUser,
-        authenticatUser
+        authenticatUser,
+        fundProject,
+        addNewMilestone,
+        startProject,
+        abortProject,
+        releaseFunds,
+        refundBackerFunds,
+        getProjectMilestone,
+        addLogMessage,
+        getLogMessage
       }}
     >
       {children}

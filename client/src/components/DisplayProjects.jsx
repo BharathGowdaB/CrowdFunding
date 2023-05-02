@@ -2,8 +2,11 @@ import React from 'react';
 
 import FundCard from './FundCard';
 import { loader } from '../assets';
+import { useNavigate } from 'react-router-dom';
 
-const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSortBy, emptyMessage = 'You have not created any project yet' }) => { 
+const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSortBy, emptyMessage = 'You have not created any project yet', clickURL } ) => { 
+  const navigate = useNavigate()
+
   const handleSetSortBy = (fieldName, value) => {
     if(fieldName == 'recent'){
       return setSortBy({...sortBy, ['recent']: !sortBy.recent, ['popular']: false})
@@ -85,6 +88,7 @@ const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSort
         {!isLoading && projectList.length > 0 && projectList.map((projectAddress) => <FundCard 
           key={projectAddress}
           projectAddress = {projectAddress}
+          handleClick = { () => { navigate('/' + clickURL + '/' + projectAddress); }}
         />)}
       </div>
     </div>

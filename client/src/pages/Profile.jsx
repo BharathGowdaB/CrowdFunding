@@ -63,7 +63,6 @@ const Profile = ( { isStarter, userAddress}) => {
 
     const fetchDetails = async () => {
       try{
-          console.log(userAddress)
           if(!userAddress) return
           await fetchProjectList();
           const details = await getUserDetails(userAddress)
@@ -79,7 +78,7 @@ const Profile = ( { isStarter, userAddress}) => {
               error: false, 
               message: error.toString(), 
               handleClick : () => {
-                  navigate('/')
+                  navigate('/home')
                   setIsLogging(false)
               }
           })
@@ -102,7 +101,7 @@ const Profile = ( { isStarter, userAddress}) => {
                 <h1 className="flex-1 font-epilogue font-[700] text-[16px] mt-[8px] text-[#b2b3bd] text-left grayscale">Email: {userDetails.email}</h1>
                 <h1 className="flex-1 font-epilogue font-[400] text-[12px] mt-[4px] text-[#b2b3bd] text-left grayscale">Address: {userAddress}</h1>
             </div>
-            <div className='relative'>
+            <div className='relative cursor-pointer'>
   
               {userDetails.verified == 0 && 
                   <div className='flex text-white font-[600] text-[16px] items-center'> 
@@ -125,7 +124,7 @@ const Profile = ( { isStarter, userAddress}) => {
                   </div>}
               
               <input type='checkbox' className='hidden' onChange={(e) => setIsVerificationForm(e.target.checked)} id='start-verification' name="start-verification form"/>
-              {userDetails.verified != 3 &&  <span className='text-[#b2b3bd] text-[12px]'>click for verification</span>}
+              {userDetails.verified != 3 &&  <label htmlFor='start-verification' className='text-[#b2b3bd] text-[12px]'>click for verification</label>}
               {
                 isVerificationForm && 
                   <div className='absolute right-0 p-4 bg-[#1c1c24] border-2 border-[#2c2f32] text-white'>
@@ -176,6 +175,7 @@ const Profile = ( { isStarter, userAddress}) => {
             total = {projectCount}
             isLoading = {isLoading}
             projectList = {projectList}
+            clickURL = 'project'
         />
     </>
     

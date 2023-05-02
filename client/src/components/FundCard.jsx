@@ -5,13 +5,8 @@ import { tagType, thirdweb } from '../assets';
 import { useStateContext } from '../context';
 import { daysLeft } from '../utils';
 
-const FundCard = ({ projectAddress}) => {
+const FundCard = ({ projectAddress , handleClick}) => {
   const navigate = useNavigate();
-  
-  const handleNavigate = (project) => {
-    // has to change
-    //navigate(`/project-details/${project.title}`, { state: project })
-  }
 
   const [project, setProjectDetails] = useState({
     address: projectAddress,
@@ -30,12 +25,11 @@ const FundCard = ({ projectAddress}) => {
   useEffect(() => {
     (async () => {
       const details = await getProjectDetails(projectAddress)
-      details.remainingDays = daysLeft(details.endTime * 1000)
+      details.remainingDays = daysLeft(details.endTime * 1000).toString().padStart(2, '0')
       setProjectDetails(details)
     })();
   }, [])
   
-  const handleClick = () => handleNavigate(projectAddress)
 
   return (
     <div className="sm:w-[288px] w-full rounded-[15px] bg-[#1c1c24] cursor-pointer" onClick={handleClick}>
