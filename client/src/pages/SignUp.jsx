@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { CustomButton, FormField, Loader, Logger } from "../components";
-import { ErrorCode } from "../constants";
 
 import { useStateContext } from "../context";
 
@@ -11,11 +10,7 @@ const Signup = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLogging, setIsLogging] = useState(false);
-  const [logger, setLogger] = useState({
-    on: false,
-    error: false,
-    message: "",
-  });
+  const [logger, setLogger] = useState({ on: false, error: false, message: ""});
 
   const [form, setForm] = useState({
     name: "",
@@ -25,15 +20,13 @@ const Signup = () => {
     isStarter: true,
   });
 
-  const { createUser } = useStateContext();
+  const { createUser, processTransactionError } = useStateContext();
 
   const handleFormFieldChange = (fieldName, e) => {
     setForm({ ...form, [fieldName]: e.target.value });
   };
 
-  const passwordReg = new RegExp(
-    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$])[0-9a-zA-Z@#$]{8,}$/
-  );
+  const passwordReg = new RegExp( /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$])[0-9a-zA-Z@#$]{8,}$/);
   const validateForm = () => {
     if (!passwordReg.test(form.password)) {
       throw {
@@ -54,7 +47,7 @@ const Signup = () => {
     try {
       validateForm();
       const txn = await createUser(form);
-      // await txn.wait();
+      await txn.wait();
 
       setLogger({
         error: false,
@@ -65,10 +58,7 @@ const Signup = () => {
         },
       });
     } catch (error) {
-      const reason = error.reason ? error.reason : error.toString();
-      const message = ErrorCode[reason.split(/execution reverted: /, 2)[1]]
-        ? ErrorCode[reason.split(/execution reverted: /, 2)[1]]
-        : reason.toString();
+      const message = processTransactionError(error).message
       setLogger({
         error: true,
         message,
@@ -88,51 +78,22 @@ const Signup = () => {
       {isLogging && <Logger {...logger} />}
 
       <div className="bg-[#13131a] px-8 py-6 rounded-[12px]  ">
-        <form
-          onSubmit={handleSubmit}
-          className="w-[300px] flex flex-col gap-[16px]"
-        >
+        <form onSubmit={handleSubmit} className="w-[300px] flex flex-col gap-[16px]" >
           <h1 className="self-center text-[#1dc071] font-[700] text-[32px]">
             Crowdfunding
           </h1>
           <div className="relative flex gap-[16px] text-[#808191] text-[18px] text-center">
-            <input
-              className="hidden"
-              type="radio"
-              id="isStrater-Starter"
-              value={form.isStarter}
-              required
-            ></input>
-            <input
-              className="hidden"
-              type="radio"
-              id="isStrater-Backer"
-              value={!form.isStarter}
-              required
-            ></input>
-            <label
-              className={`z-10 flex-1  signup-label ${
-                form.isStarter && "text-black"
-              }`}
+            <input className="hidden" type="radio" id="isStrater-Starter" value={form.isStarter} required />
+            <input className="hidden" type="radio" id="isStrater-Backer" value={!form.isStarter} required />
+            <label className={`z-10 flex-1  signup-label ${ form.isStarter && "text-black"  }`}
               onClick={(e) => setForm({ ...form, ["isStarter"]: true })}
               htmlFor="isStrater-Starter"
-            >
-              Starter
-            </label>
-            <label
-              className={`z-10 flex-1 signup-label ${
-                !form.isStarter && "text-black"
-              }`}
+            >  Starter </label>
+            <label className={`z-10 flex-1 signup-label ${ !form.isStarter && "text-black" }`}
               onClick={(e) => setForm({ ...form, ["isStarter"]: false })}
               htmlFor="isStrater-Backer"
-            >
-              Backer
-            </label>
-            <div
-              className={`z-1 absolute p-4 rounded-[24px] w-[48%] bg-[#1dc071] left-0 transition-[left] duration-700 ${
-                !form.isStarter && "left-[52%]"
-              } `}
-            ></div>
+            >  Backer </label>
+            <div className={`z-1 absolute p-4 rounded-[24px] w-[48%] bg-[#1dc071] left-0 transition-[left] duration-700 ${ !form.isStarter && "left-[52%]"  } `} ></div>
           </div>
           <FormField
             labelName="Username *"

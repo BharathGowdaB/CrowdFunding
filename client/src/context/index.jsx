@@ -1,13 +1,18 @@
 import React, { useContext, createContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-
 
 import milestoneABI from "../../../abi/milestone.json";
 import { ethers } from 'ethers';
 import { Address, ABI , ErrorCode } from '../constants/index';
+import { User } from '../pages';
 
 const StateContext = createContext();
 
+const BackerOption = {
+  "start": 0,
+  "refund": 1,
+  "milestone": 2,
+  "end": 3
+} 
 const provider = new ethers.providers.Web3Provider(window.ethereum)
 const signer = provider.getSigner();
 
@@ -22,6 +27,40 @@ const starterContract = new ethers.Contract(ethers.constants.AddressZero, ABI.st
 const backerContract = new ethers.Contract(ethers.constants.AddressZero, ABI.backerABI, signer);
 
 export const StateContextProvider = ({ children }) => {
+
+  const getBalance = async (address) => {
+    const balance =  await provider.getBalance(address)
+    return ethers.utils.formatUnits(balance, 18)
+  }
+
+  const processTransactionError =  (error) => {
+    const reason = error.reason ? error.reason : error.toString()
+    const errorCode = ErrorCode[reason.split(/execution reverted: /, 2)[1]] ? parseInt(reason.split(/execution reverted: /, 2)[1]) : 0
+
+    const message = errorCode == 0 ? reason : ErrorCode[errorCode]
+   
+    return { message, errorCode};
+  }
+
+  const processViewError =  (error) => {
+    const errorCode = ErrorCode[error.reason] ? parseInt(error.reason) : 0
+
+    const message = (errorCode == 0) ? error.toString() : ErrorCode[errorCode]
+
+    return { message, errorCode};
+  }
+
+  const getPublicAddress = async(email, isStarter) => {
+    const userAddress = isStarter ? await crowdfundingContract.starterList(email) : await crowdfundingContract.backerList(email)
+    
+    return await userContract.attach(userAddress).id()
+  
+  }
+
+  const getPublicAddressByAddress = async(userAddress) => {
+    return await userContract.attach(userAddress).id()
+  
+  }
 
   const createProject = async (starterAddress, form) => {
     if(form.fundingDuration < 0) throw {reason: 'execution reverted: 431'}
@@ -56,7 +95,7 @@ export const StateContextProvider = ({ children }) => {
     return await databaseContract.getProjectList([skip, noSort, recent, popular, onlyCharity, onlyStartup])
   }
 
-  const getProjectDetails = async(projectAddress) => {
+  const getProjectDetails = async(projectAddress, userAddress) => {
     const response = await projectContract.attach(projectAddress).getProjectDetails()
     const amountRaised = await projectContract.attach(projectAddress).amountRaised()
 
@@ -70,15 +109,25 @@ export const StateContextProvider = ({ children }) => {
       amountRaised : ethers.utils.formatUnits(amountRaised, 18),
       starterId: await projectContract.attach(projectAddress).starterId(),
       isCharity: await projectContract.attach(projectAddress).isCharity(),
-      image: await databaseContract.getProjectImage(projectAddress)
+      image: await databaseContract.getProjectImage(projectAddress),
+      balance: await getBalance(projectAddress),
     }
 
     return details
   }
 
-  const getMilestoneDetails = async(milestoneAddress) => {
-    const response = await milestoneContract.attach(milestoneAddress).getMilestoneDetails()
+  const getProjectVote = async (userAddress, projectAddress) => {
+    const res =  {
+      isTerminate: await startupContract.attach(projectAddress).endProjectVotes(userAddress),
+      votes: await startupContract.attach(projectAddress).cumulativeVotes(),
+      maxVotes: await startupContract.attach(projectAddress).amountRaised()
+    } 
+    return res;
+  }
 
+  const getMilestoneDetails = async(userAddress, milestoneAddress ) => {
+    const response = await milestoneContract.attach(milestoneAddress).getMilestoneDetails()
+    
     const details = {
       title: response.title,
       description: response.description,
@@ -86,6 +135,7 @@ export const StateContextProvider = ({ children }) => {
       state: parseInt(response.state),
       fundsRequired : ethers.utils.formatUnits(response.fundsRequired, 18),
       returnAmount : ethers.utils.formatUnits(response.returnAmount, 18),
+      vote : await milestoneContract.attach(milestoneAddress).votes(userAddress)
     }
 
     return details
@@ -135,8 +185,11 @@ export const StateContextProvider = ({ children }) => {
     return await charityContract.attach(projectAddress).releaseFunds()
   }
 
-  const startProject = async (projectAddress) => {
-    return await startupContract.attach(projectAddress).startProject()
+  const startProject = async (projectAddress, userAddress) => {
+    if(userAddress) 
+      return await backerContract.attach(userAddress).updateProject(projectAddress, BackerOption.start, false)
+    else 
+      return await startupContract.attach(projectAddress).startProject()    
   }
 
   const abortProject = async (projectAddress , isCharity) => {
@@ -146,12 +199,38 @@ export const StateContextProvider = ({ children }) => {
       return await startupContract.attach(projectAddress).abortProject()
   }
 
+  const endProject = async (userAddress, projectAddress, vote) => {
+    return await backerContract.attach(userAddress).updateProject(projectAddress, BackerOption.end, vote);
+  }
+
   const refundBackerFunds = async (userAddress, projectAddress) => {
-    return await backerContract.attach(userAddress).returnProjectFunds(projectAddress)
+    return await backerContract.attach(userAddress).updateProject(projectAddress, BackerOption.refund, false)
   }
 
   const addNewMilestone = async (projectAddress, form) => {
     return await startupContract.attach(projectAddress).addMilestone(form.title, form.description, form.fundsRequired, form.returnAmount);
+  }
+
+  const voteMilestone = async (userAddress, milestoneAddress, vote) => {
+    return await backerContract.attach(userAddress).updateProject(milestoneAddress, BackerOption.milestone, vote);
+  }
+
+  const startMilestone = async (projectAddress, milestoneAddress) => {
+    return await startupContract.attach(projectAddress).releaseMilestoneFunds(milestoneAddress)
+  }
+
+  const endMilestone = async (projectAddress, milestoneAddress, returnAmount) => {
+    return await startupContract.attach(projectAddress).endMilestone(milestoneAddress, {value: ethers.utils.parseUnits('0' + returnAmount, "ether")})
+  }
+
+  const getMilestoneVotes = async (projectAddress, milestoneAddress) => {
+    const res = {
+      result: await milestoneContract.attach(milestoneAddress).getVotingResult(),
+      votes: await milestoneContract.attach(milestoneAddress).cumulativeVotes(),
+      maxVotes: await projectContract.attach(projectAddress).amountRaised()
+    }
+
+    return res
   }
   
   const addLogMessage = async (userAddress, isStarter, projectAddress, message) => {
@@ -173,23 +252,40 @@ export const StateContextProvider = ({ children }) => {
   return (
     <StateContext.Provider
       value={{ 
-        createProject,
-        getProjectList,
-        getProjectDetails,
-        getMilestoneDetails,
+        getBalance,
+        processTransactionError,
+        processViewError,
+        getPublicAddress,
+        getPublicAddressByAddress,
         getUserDetails,
         getUserProjects,
+        getProjectList,
+        getProjectDetails,
+        getProjectMilestone,
+        getMilestoneDetails,
+        getMilestoneVotes,
+        getProjectVote,
+        
         checkStarterVerified,
         applyForVerification,
+        
         createUser,
         authenticatUser,
-        fundProject,
+
         addNewMilestone,
-        startProject,
+        voteMilestone,
+        startMilestone,
+        endMilestone,
+
+        createProject,
+        fundProject,
         abortProject,
+        startProject,
+        endProject,
+
         releaseFunds,
         refundBackerFunds,
-        getProjectMilestone,
+
         addLogMessage,
         getLogMessage
       }}

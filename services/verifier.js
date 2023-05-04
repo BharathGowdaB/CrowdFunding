@@ -24,9 +24,6 @@ async function main(){
   });
 
   console.log('Verifier Running...')
-
-  //verify single user
-  //await app.verifyStarter('0xDc2cF906a571bcF751857806922d5AD4c5c3D014' , VerificationState.verified)
 }
 
 main()

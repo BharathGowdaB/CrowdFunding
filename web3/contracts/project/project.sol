@@ -5,6 +5,7 @@ import { User } from '../user/user.sol';
 
 import { ProjectState , ProjectDetails} from '../utils/definitions.sol';
 import { minFundingPeriod } from '../utils/constants.sol';
+
 contract Project {
  
     address public id;

@@ -2,14 +2,14 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import { Database } from './db.sol';
-import { CharityLamda, StartupLamda } from './lamda.sol';
+import { CharityLamda, StartupLamda, MilestoneLamda, BackerLamda } from './lamda.sol';
 import { Validator } from './validator.sol';
 
 import { Starter } from '../user/starter.sol';
 import { Backer } from '../user/backer.sol';
 
 import { AttestData, VerificationState, VerificationData } from '../utils/definitions.sol';
-import { dbAddress, charityLamdaAddress, startupLamdaAddress, validatorAddress } from '../utils/address.sol';
+import { dbAddress, charityLamdaAddress, startupLamdaAddress, validatorAddress, milestoneLamdaAddress, backerLamdaAddress } from '../utils/address.sol';
 import { minUpdateGap } from '../utils/constants.sol';
 
 
@@ -19,8 +19,8 @@ contract Crowdfunding{
     Database public db;
     address public admin;
 
-    mapping(string => address) private backerList;
-    mapping(string => address) private starterList;
+    mapping(string => address) public backerList;
+    mapping(string => address) public starterList;
     mapping(address => VerificationData) private verifiedList;
 
     constructor() {
@@ -30,6 +30,8 @@ contract Crowdfunding{
 
         CharityLamda(charityLamdaAddress).init(dbAddress);
         StartupLamda(startupLamdaAddress).init(dbAddress);
+        MilestoneLamda(milestoneLamdaAddress).init();
+        BackerLamda(backerLamdaAddress).init();
     }
     
     function createStarter(string memory name, string memory _email, string memory _password) 
@@ -54,13 +56,9 @@ contract Crowdfunding{
     
     function createBacker(string memory name, string memory _email, string memory _password) 
         public returns(address) {
-            require(Validator(validatorAddress).isEmail(_email), '420');
-            require(Validator(validatorAddress).isPassword(_password), '421');
-            require(Validator(validatorAddress).isTitle(name), '422');
-
             require(backerList[_email] == address(0), "402");
 
-            backerList[_email] = address(new Backer(msg.sender, name, _email, _password));
+            backerList[_email] = BackerLamda(backerLamdaAddress).createBacker(msg.sender, name, _email, _password);
 
             return backerList[_email];
         }

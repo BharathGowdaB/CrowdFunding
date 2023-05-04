@@ -15,11 +15,7 @@ const Milestone = ({isStarter, userAddress}) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLogging, setIsLogging] = useState(false);
-  const [logger, setLogger] = useState({
-    on: false,
-    error: false,
-    message: "",
-  });
+  const [logger, setLogger] = useState({ error: false, message: "", handleClick: "" });
 
   const [projectList, setProjectList] = useState([]);
   const [projectAddress, setProjectAddress] = useState(paramAddress)
@@ -42,7 +38,6 @@ const Milestone = ({isStarter, userAddress}) => {
     setIsLoading(true)
     const [list, count] = await getProjectMilestone(projectAddress);
     setProjectMilestone(list);
-    console.log(list)
     setIsLoading(false);
   }
 
@@ -68,6 +63,8 @@ const Milestone = ({isStarter, userAddress}) => {
 
   return (
       <>
+      {isLoading && <Loader />}
+      {isLogging && <Logger {...logger} />}
         <div className={`flex-1 justify-between items-center bg-[#1c1c24] rounded-[12px] w-fit p-4 mb-4`}>
             <div className=" w-full">
                 <label className="text-[#b2b3bd]">Project Address:</label>
@@ -85,6 +82,9 @@ const Milestone = ({isStarter, userAddress}) => {
                         projectAddress={projectAddress}
                         userAddress={userAddress}
                         isStarter={isStarter}
+                        setIsLoading={setIsLoading}
+                        setIsLogging={setIsLogging}
+                        setLogger={setLogger}
                    />
                 ))
             }

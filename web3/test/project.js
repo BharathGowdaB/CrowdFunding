@@ -1,6 +1,6 @@
 const { ethers ,waffle } = require("hardhat");
 const { expect } = require("chai");
-const {VerificationState, deployContract, starterDetails, backerDetails, createProjects, constants} = require('./util.js');
+const {VerificationState, BackerOption, deployContract, starterDetails, backerDetails, createProjects, constants} = require('./util.js');
 const { ProjectState, MilestoneState } = require("../../config/enumDefinitions.js");
 
 let app ;
@@ -37,6 +37,8 @@ before(async () => {
 
   await app.createStarter(starterDetails.name, 'CharityTestcase@gmail.com' , starterDetails.password)
   starterAddress  = await app.authenticateStarter('CharityTestcase@gmail.com' , starterDetails.password)
+
+  await app.verifyStarter(starterAddress , VerificationState.verified);
 
   Starter = await ethers.getContractFactory("Starter")
 
@@ -86,7 +88,7 @@ describe("Project Contract:", async() => {
       const backerFunds = await  Project.attach(charityAddress).backers(backer)
 
       expect(await  Project.attach(charityAddress).backers(backer)).equals(fundValue)
-      await Backer.attach(backer).returnProjectFunds(charityAddress)
+      await Backer.attach(backer).updateProject(charityAddress, BackerOption.refund, false)
       expect(await  Project.attach(charityAddress).backers(backer)).equals(0)
 
       expect(await Project.attach(charityAddress).amountRaised()).equals( parseInt(beforeAmountRaised)  + fundValue2)
@@ -106,7 +108,7 @@ describe("Project Contract:", async() => {
 
     await Charity.attach(charityAddress).setProjectState(ProjectState.ended, 0);
 
-    await expect(Backer.attach(backer).returnProjectFunds(charityAddress)).to.be.reverted
+    await expect(Backer.attach(backer).updateProject(charityAddress, BackerOption.refund, false)).to.be.reverted
   
   })
 })
@@ -299,13 +301,13 @@ describe("Startup Contract:", function () {
     
     await Startup.attach(startupAddress).setProjectState(ProjectState.inExecution, 0);
 
-    await Backer.connect(other1).attach(backer1).endProject(startupAddress, true);
+    await Backer.connect(other1).attach(backer1).updateProject(startupAddress, BackerOption.end, true);
     const backerBalance1 = await ethers.provider.getBalance(other1.address)
     
     await Startup.attach(startupAddress).setProjectState(ProjectState.inExecution, 0 , {value : (fundValue1 + fundValue2) * 3})
     expect(await ethers.provider.getBalance(startupAddress)).equals((fundValue1 + fundValue2) * 4)
 
-    await Backer.connect(other2).attach(backer2).endProject(startupAddress, true);
+    await Backer.connect(other2).attach(backer2).updateProject(startupAddress, BackerOption.end, true);
 
     expect(await ethers.provider.getBalance(startupAddress)).equals(0)
     expect(await ethers.provider.getBalance(other1.address)).equals(BigInt(backerBalance1) + BigInt(fundValue1 * 4)) 
@@ -442,7 +444,7 @@ describe("Milestone Contract:", async() => {
     await Startup.attach(startupAddress).addMilestone(milestone.title, milestone.description, milestone.fundsRequired, milestone.returnAmount)
     const [lastMilestone, count2] = await Startup.attach(startupAddress).getMilestone(count > 0 ?count - 1 : 0)
 
-    const currentVotes = await Milestone.attach(lastMilestone).cumulativeRejectVotes()
+    const currentVotes = await Milestone.attach(lastMilestone).cumulativeVotes()
 
     const [owner, other1, other2] = await ethers.getSigners()
     const backer1 = await app.connect(other1).authenticateBacker('beforeEachMilestoneBacker1@gmail.com', backerDetails.password);
@@ -450,12 +452,11 @@ describe("Milestone Contract:", async() => {
     const fundValue1 = constants.fundingDenomination.realValue * 20
     const backer2 = await app.connect(other2).authenticateBacker('beforeEachMilestoneBacker2@gmail.com', backerDetails.password);
     const fundValue2 = constants.fundingDenomination.realValue * 40
-    expect(currentVotes).equals(0)
 
-    await expect(Backer.attach(backer1).voteMilestone(lastMilestone, true)).to.be.reverted
+    await expect(Backer.attach(backer1).updateProject(lastMilestone, BackerOption.milestone, false)).to.be.reverted
 
-    await Backer.connect(other1).attach(backer1).voteMilestone(lastMilestone, false)
-    const newVotes = await Milestone.attach(lastMilestone).cumulativeRejectVotes()
+    await Backer.connect(other1).attach(backer1).updateProject(lastMilestone,BackerOption.milestone, true)
+    const newVotes = await Milestone.attach(lastMilestone).cumulativeVotes()
 
     if(fundValue1 > fundValue2){
       expect(await Milestone.attach(lastMilestone).getVotingResult()).equals(false)
@@ -464,7 +465,7 @@ describe("Milestone Contract:", async() => {
   
     }
 
-    expect(newVotes).equals(fundValue1)
+    expect(newVotes).equals(currentVotes - fundValue1)
   })
 
 })

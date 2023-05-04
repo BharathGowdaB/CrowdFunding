@@ -3,8 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 
 import { verified, failed, inProgress,inFunding, tagType, funded} from '../assets';
-import { CustomButton, FormField, Loader, Logger , MilestoneCard} from "../components";
-import { ErrorCode } from "../constants";
+import { CustomButton, FormField, Loader, Logger } from "../components";
 import { daysLeft } from "../utils";
 
 import { useStateContext } from "../context";
@@ -12,16 +11,11 @@ import { useStateContext } from "../context";
 const Project = ({isStarter, userAddress}) => {
   const navigate = useNavigate();
 
-  const {projectAddress: temparamAddress} = useParams()
-  const paramAddress = temparamAddress == '0' ? undefined : temparamAddress;
+  const { projectAddress: paramAddress } = useParams()
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLogging, setIsLogging] = useState(false);
-  const [logger, setLogger] = useState({
-    on: false,
-    error: false,
-    message: "",
-  });
+  const [logger, setLogger] = useState({ on: false, error: false, message: ""});
 
   const [projectDetails, setProjectDetails] = useState({
     title: "",
@@ -35,18 +29,26 @@ const Project = ({isStarter, userAddress}) => {
     starterId: "",
     backersCount: "",
     daysLeft: '',
-    diffAmount: ''
+    diffAmount: '',
+    balance: 0
   });
 
   const [projectList, setProjectList] = useState([]);
   const [logMessageList, setLogMessageList] = useState([]);
-  const [projectCount, setProjectCount] = useState(0);
   const [projectAddress, setProjectAddress] = useState(paramAddress)
   const [isAddMilestone, setIsAddMilestone] = useState(false)
   const [fundValue, setFundValue] = useState(0)
   const [logMessage, setLogMessage] = useState('')
 
-  const { addLogMessage, getLogMessage ,getProjectDetails ,getUserProjects,getProjectMilestone, addNewMilestone,releaseFunds, startProject, fundProject, abortProject, refundBackerFunds} = useStateContext();
+  const [currentVote, setCurrentVote] = useState({
+    votes: 0,
+    maxVotes: 0
+  })
+  const [isTerminate, setIsTerminate] = useState(false)
+
+  const { addLogMessage, getLogMessage ,getProjectDetails , startProject,endProject,getProjectVote,
+      getUserProjects, addNewMilestone,releaseFunds, processTransactionError, processViewError,
+      fundProject, abortProject, refundBackerFunds} = useStateContext();
 
   const [form, setForm] = useState({
     title: '',
@@ -56,28 +58,24 @@ const Project = ({isStarter, userAddress}) => {
   })
 
   const handleLogMessage  = async(e) => {
-      e.preventDefault()
-      setIsLoading(true)
+    e.preventDefault()
+    setIsLoading(true)
     try{
         const tnx = await addLogMessage(userAddress, isStarter, projectAddress,logMessage)
         await tnx.wait()
 
-        setLogger({
-            error: false,
-            message: "Message Logged",
-            handleClick: function () {
+        fetchLogMessages()
+
+        setLogger({ error: false, message: "Message Logged", handleClick: function () {
               setIsLogging(false);
-            },
-          });
+            }
+        });
+        
     } catch (error) {
-        const reason = error.reason ? error.reason : error.toString();
-        const message = ErrorCode[reason.split(/execution reverted: /, 2)[1]]? ErrorCode[reason.split(/execution reverted: /, 2)[1]]: reason.toString();
-        setLogger({
-            error: true,
-            message,
-            handleClick: function () {
-                navigate('/project/'+projectAddress)
+        const { message } = processTransactionError(error)  
+        setLogger({ error: true, message, handleClick: function () {
               setIsLogging(false);
+              navigate('/project/'+projectAddress)
             },
         });
         setIsLogging(true)
@@ -93,7 +91,6 @@ const Project = ({isStarter, userAddress}) => {
     e.preventDefault()
     setIsLoading(true)
     try{
-        console.log(form)
         const tnx = await addNewMilestone(projectAddress,{
             ...form,
             ['fundsRequired'] : ethers.utils.parseUnits(form.fundsRequired, 18),
@@ -101,28 +98,22 @@ const Project = ({isStarter, userAddress}) => {
         })
 
         await tnx.wait()
-        setLogger({
-            error: false,
-            message: "Milestone Created Successfully",
-            handleClick: function () {
-                setIsAddMilestone(false)
+        setLogger({ error: false, message: "Milestone Created Successfully", handleClick: function () {
+              setIsAddMilestone(false)
               setIsLogging(false);
-            },
-          });
-    } catch (error) {
-        console.log(error)
-        const reason = error.reason ? error.reason : error.toString();
-        const message = ErrorCode[reason.split(/execution reverted: /, 2)[1]]? ErrorCode[reason.split(/execution reverted: /, 2)[1]]: reason.toString();
-        setLogger({
-            error: true,
-            message,
-            handleClick: function () {
-                navigate('/project/'+ projectAddress)
-              setIsLogging(false);
+              navigate('/project/'+ projectAddress)
             },
         });
-        setIsLogging(true)
+    } catch (error) {
+        const { message } = processTransactionError(error) 
+        setLogger({ error: true, message, handleClick: function () {
+              setIsLogging(false);
+              navigate('/project/'+ projectAddress)
+            },
+        });
+        
     }
+    setIsLogging(true)
     setIsLoading(false)
   }
 
@@ -131,30 +122,22 @@ const Project = ({isStarter, userAddress}) => {
     try{
         let tnx , message;
         if(projectDetails.isCharity) {
-             tnx =  await releaseFunds(projectAddress)
-             message = 'Funds Released'
+            tnx =  await releaseFunds(projectAddress)
+            message = 'Funds Released'
         }
         else{
-            tnx = await startProject(projectAddress)
+            tnx = await startProject(projectAddress, userAddress)
             message = "Project Started: In Execution"
         }
-        
         await tnx.wait()
-        setLogger({
-            error: false,
-            message,
-            handleClick: function () {
+
+        setLogger({ error: false, message, handleClick: function () {
               setIsLogging(false);
             },
-          });
+        });
     } catch (error) {
-        console.log(error)
-        const reason = error.reason ? error.reason : error.toString();
-        const message = ErrorCode[reason.split(/execution reverted: /, 2)[1]]? ErrorCode[reason.split(/execution reverted: /, 2)[1]]: reason.toString();
-        setLogger({
-            error: true,
-            message,
-            handleClick: function () {
+        const { message } = processTransactionError(error) 
+        setLogger({ error: true, message, handleClick: function () {
               setIsLogging(false);
             },
         });
@@ -170,20 +153,13 @@ const Project = ({isStarter, userAddress}) => {
         const message = "Project Aborted"
         
         await tnx.wait()
-        setLogger({
-            error: false,
-            message,
-            handleClick: function () {
+        setLogger({ error: false, message, handleClick: function () {
               setIsLogging(false);
             },
-          });
+        });
     } catch (error) {
-        const reason = error.reason ? error.reason : error.toString();
-        const message = ErrorCode[reason.split(/execution reverted: /, 2)[1]] ? ErrorCode[reason.split(/execution reverted: /, 2)[1]]: reason.toString();
-        setLogger({
-            error: true,
-            message: message,
-            handleClick: function () {
+        const { message } = processTransactionError(error) 
+        setLogger({ error: true, message: message, handleClick: function () {
               setIsLogging(false);
             },
         });
@@ -199,16 +175,13 @@ const Project = ({isStarter, userAddress}) => {
       const tnx = await fundProject(userAddress, projectAddress, ethers.utils.parseUnits('0' + fundValue, "ether"))
       await tnx.wait()
 
-      setLogger({error: false, message: "Funded Successfully" , handleClick : function () { setIsLogging(false)} })
+      setLogger({error: false, message: "Funded Successfully" , handleClick : function () { 
+          setIsLogging(false)
+        } 
+      })
     } catch(error){
-      const reason = error.reason ? error.reason : error.toString();
-      const message = ErrorCode[reason.split(/execution reverted: /, 2)[1]]
-        ? ErrorCode[reason.split(/execution reverted: /, 2)[1]]
-        : reason.toString();
-      setLogger({
-        error: true,
-        message,
-        handleClick: function () {
+      const { message } = processTransactionError(error) 
+      setLogger({  error: true, message, handleClick: function () {
           setIsLogging(false);
         },
       });
@@ -224,20 +197,36 @@ const Project = ({isStarter, userAddress}) => {
         await tnx.wait()
         const message = "Funds Refunded Successfully"
         
-        setLogger({
-            error: false,
-            message,
-            handleClick: function () {
+        setLogger({ error: false, message,  handleClick: function () {
               setIsLogging(false);
             },
           });
     } catch (error) {
-        const reason = error.reason ? error.reason : error.toString();
-        const message = ErrorCode[reason.split(/execution reverted: /, 2)[1]] ? ErrorCode[reason.split(/execution reverted: /, 2)[1]]: reason.toString();
-        setLogger({
-            error: true,
-            message: message,
-            handleClick: function () {
+        const { message } = processTransactionError(error) 
+        setLogger({ error: true, message: message, handleClick: function () {
+              setIsLogging(false);
+            },
+        });
+        
+    }
+    setIsLogging(true)
+    setIsLoading(false)
+  }
+
+  const handleEndProject = async (vote) => {
+    setIsLoading(true)
+    try{
+        const tnx = await endProject(userAddress, projectAddress, vote)
+        await tnx.wait()
+        const message = "Voted Successfully"
+        
+        setLogger({ error: false, message,  handleClick: function () {
+              setIsLogging(false);
+            },
+          });
+    } catch (error) {
+        const { message } = processTransactionError(error) 
+        setLogger({ error: true, message: message, handleClick: function () {
               setIsLogging(false);
             },
         });
@@ -248,68 +237,92 @@ const Project = ({isStarter, userAddress}) => {
   }
 
   const fetchLogMessages = async() => {
-    setIsLoading(true);
+    setIsLoading(true); 
+
     const [list, count] = await getLogMessage(projectAddress);
     setLogMessageList(list);
+
     setIsLoading(false);
   }
 
   const fetchProjectList = async () => {
     setIsLoading(true);
+
     const [list, count] = await getUserProjects(userAddress);
-    setProjectCount(parseInt(count));
     setProjectList(list);
+
+    console.log(paramAddress)
     if(paramAddress) setProjectAddress(paramAddress)
-    else setProjectAddress(list[0])
+    else if(count > 0) setProjectAddress(list[0])
+
     setIsLoading(false);
   }
-
-
 
   const fetchDetails = async() => {
       setIsLoading(true)
       try{
         await fetchProjectList()
+  
+        if(projectAddress && projectAddress != ethers.constants.AddressZero)  await fetchLogMessages()
+
       } catch(error){
-        console.log(error)
+        const { message } = processViewError(error)  
+        setLogger({ error: true, message, handleClick: function () {
+              setIsLogging(false);
+            },
+        });
+        setIsLogging(true)
       }
       setIsLoading(false)
+  }
+
+  const fetchProjectVote = async () => {
+      const res = await getProjectVote(userAddress, projectAddress)
+      setIsTerminate(res.isTerminate)
+      setCurrentVote(res)
   }
 
   const fetchProject = async () => {
     setIsLoading(true)
       try{
-        const details = await getProjectDetails(projectAddress)
+        const details = await getProjectDetails(projectAddress, userAddress)
         details.daysLeft = daysLeft(details.endTime * 1000).padStart(2, '0')
         setProjectDetails(details)
+
+        if(!details.isCharity){
+          await fetchProjectVote()
+        }
+
       } catch(error){
-        console.log(error)
+        const { message } = processViewError(error)  
+        setLogger({ error: true, message, handleClick: function () {
+              setIsLogging(false);
+            },
+        });
+        setIsLogging(true)
       }
       setIsLoading(false)
   }
 
   useEffect(() => {
-    fetchLogMessages()
-  },[logger])
+    if(projectAddress && projectAddress != ethers.constants.AddressZero) fetchLogMessages()
+  },[projectAddress])
 
   useEffect(() => {
-      if(userAddress){
-        fetchDetails()
-        fetchLogMessages()
-      }
-        
+      if(userAddress) fetchDetails()    
   }, [userAddress])
 
   useEffect(() => {
-      if(projectAddress)
-        fetchProject()
+      if(projectAddress && projectAddress != ethers.constants.AddressZero) fetchProject()
     },[projectAddress, logger])
 
   return (
     <>
       {isLoading && <Loader />}
       {isLogging && <Logger {...logger} />}
-        { projectList.length == 0 && !paramAddress && <div className={`flex-1 flex flex-col justify-between items-center bg-[#1c1c24] rounded-[12px] w-full p-4 mb-4 text-white`}> No Projects</div>}
+        { projectList.length == 0 && !paramAddress && <div className={`  bg-[#1c1c24] rounded-[12px] w-full p-4 mb-4 text-white`}> No Project Found: 
+            <span className="text-[#b2b3bd]">{isStarter ? ' Please Create New Project': ' Please Fund Project'}</span>
+          </div>}
         { (projectList.length > 0 || paramAddress) && <><div className={`flex-1 flex flex-col justify-between items-center bg-[#1c1c24] rounded-[12px] w-full p-4 mb-4`}>
             <div className=" w-full pb-2">
                 <select onChange={(e) => setProjectAddress(e.target.value)} id='projectList' className="bg-[#1c1c24] text-[#b2b3bd]  p-1 outline-0 rounded-[8px]">
@@ -353,6 +366,11 @@ const Project = ({isStarter, userAddress}) => {
                                 <div className='p-[10px] pl-[8px] min-h-[36px] text-[#b2b3bd]'>Project{projectDetails.state == 4 ? ' Rejected': ' Aborted'}</div>
                             </div>}
                     </div>
+                    <div className="mt-6 mb-6">
+                      <p className="mt-[3px] font-epilogue font-normal text-[16px] leading-[18px] text-[#808191] ">
+                        Balance: <span className=" font-semibold text-[16px] text-[#b2b3bd] ml-[6px] leading-[22px]">{"   "+ projectDetails.balance + "  ETH"}</span>
+                      </p>
+                    </div>
                     
                     <div className="mt-4 mb-4">
                         <p className="mt-[3px] font-epilogue font-normal text-[14px] leading-[18px] text-[#808191] ">
@@ -395,25 +413,43 @@ const Project = ({isStarter, userAddress}) => {
                 {projectDetails.description}
             </div>
         </div>
-        { projectDetails.state == 1 && isStarter && <div className="flex gap-4 mb-2">
+        { projectDetails.state == 1 && isStarter && <div className="flex gap-4 mb-4">
             <CustomButton 
                 btnType="button"
                 title={ projectDetails.isCharity ? 'Release Funds' :"Start Project"}
-                styles="bg-[#116f41] hover:bg-[#1ec775] rounded-[8px]"
+                styles="bg-[#116f41] hover:bg-[#1ec775] rounded-[4px]"
                 handleClick={handleStartProject}
             />
             <CustomButton 
                 btnType="button"
                 title={"Abort Project"}
-                styles="bg-[#df060a] hover:bg-[#f92023] rounded-[8px]"
+                styles="bg-[#df060a] hover:bg-[#f92023] rounded-[4px]"
                 handleClick={handleAbortProject}
             />
         </div>}
-        { projectDetails.state == 1 && !isStarter && <div className="flex gap-4 mb-2">
-                <CustomButton 
+        { projectDetails.state == 2 && !isStarter &&
+          <div className="flex gap-4 mb-4 justify-end items-center">
+            <div className="text-[#b2b3bd]">
+              Current Termination Request: <span className="font-[500]">{ `${Math.round(currentVote.votes / currentVote.maxVotes * 10000.0) / 100} %`}</span>
+            </div>
+            { !isTerminate && <CustomButton 
+                btnType="button"
+                title={ 'Terminate Project'}
+                styles="bg-[#df060a] hover:bg-[#f92023] rounded-[4px]"
+                handleClick={() => handleEndProject(true)}
+                />}
+             { isTerminate && <CustomButton 
+                btnType="button"
+                title={ 'Recall Termination'}
+                styles="bg-[#116f41] hover:bg-[#1ec775] rounded-[4px]"
+                handleClick={() => handleEndProject(false)}
+                />}
+          </div>}
+        { projectDetails.state == 1 && projectDetails.daysLeft != "00" && !isStarter && <div className="flex gap-4 mb-4">
+               <CustomButton 
                 btnType="button"
                 title={ 'Refund Funds'}
-                styles="bg-[#df060a] hover:bg-[#f92023] rounded-[8px]"
+                styles="bg-[#df060a] hover:bg-[#f92023] rounded-[4px]"
                 handleClick={handleRefundFunds}
                 />
             <div className="flex justify-end items-center flex-1">
@@ -444,7 +480,16 @@ const Project = ({isStarter, userAddress}) => {
                 </form>
             </div>
             </div>}
-        { !projectDetails.isCharity && projectDetails.state == 2 && <div className="flex-1 flex flex-col  justify-between bg-[#1c1c24] rounded-[12px] w-full p-4 mb-4">
+        { projectDetails.state == 1 && !projectDetails.isCharity && projectDetails.daysLeft == "00" && !isStarter && <div className="flex gap-4 mb-4">
+               <CustomButton 
+                btnType="button"
+                title={ 'Start Project'}
+                styles="bg-[#116f41] hover:bg-[#1ec775] rounded-[8px]"
+                handleClick={handleStartProject}
+                />
+              </div>}
+        { !projectDetails.isCharity && projectDetails.state == 2 && 
+          <div className="flex-1 flex flex-col  justify-between bg-[#1c1c24] rounded-[12px] w-full p-4 mb-4">
             <div className="text-[#b2b3bd] mb-[4px] text-[14px] font-600">Milestones: </div>
             <div className="flex gap-4">
             {projectDetails.starterId == userAddress &&  <div className="flex flex-col">
@@ -515,7 +560,7 @@ const Project = ({isStarter, userAddress}) => {
             </div>
             </div>
         </div>}
-        <div className="flex-1 flex flex-col  justify-between bg-[#1c1c24] rounded-[12px] w-full p-4 mb-4">
+        <div className="flex-1 flex flex-col  justify-between bg-[#1c1c24] rounded-[12px] w-full mt-4 p-4 mb-4">
             <div className="text-[#b2b3bd] mb-[12px] text-[14px] font-600">Message Log: </div>
             <div>
                 {

@@ -113,6 +113,7 @@ const UserDetails = () => {
             isLoading = {isLoading}
             projectList = {projectList}
             emptyMessage = {'User has zero projects'}
+            clickURL = 'project-details'
         />
     </>
     
