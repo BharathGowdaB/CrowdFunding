@@ -102,7 +102,7 @@ const Profile = ( { isStarter, userAddress, WhiteTheme}) => {
   return (
     <>
         {isLoading && <Loader/>}
-        {isLogging && <Logger {...logger}/>}
+        {isLogging && <Logger {...logger} WhiteTheme={WhiteTheme}/>}
         <div className={`flex-1 flex  justify-between items-center ${WhiteTheme ? "bg-[#ffffff] box-shadow" : "bg-[#1c1c24]"} rounded-[12px] w-full p-4 mt-8 mb-4`}> 
             <div >
                 <h1 className={`flex-1 font-epilogue font-semibold text-[30px] capitalize ${WhiteTheme ? "text-[#101010]": "text-white"} text-left min-w-[150px]`}>{userDetails.name}</h1>

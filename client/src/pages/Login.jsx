@@ -72,7 +72,7 @@ const Login = ({WhiteTheme = true}) => {
   return (
     <div className="bg-[#ffffff] flex justify-center items-center  w-full min-h-screen h-full ">
       {isLoading && <Loader />}
-      {isLogging && <Logger {...logger} />}
+      {isLogging && <Logger {...logger} WhiteTheme={WhiteTheme}/>}
       <div className={`h-[100%] max-h-[100vh] bg-gradient-to-r from-slate-950 to-transparent bg-blend-multiply shadow-2xl`}>
         <img className="bg-blend-multiply max-h-[100vh] contain " src={blockchain}/>
       </div>

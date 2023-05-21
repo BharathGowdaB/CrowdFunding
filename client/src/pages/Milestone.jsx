@@ -67,7 +67,7 @@ const Milestone = ({ isStarter, userAddress , WhiteTheme}) => {
   return (
     <>
       {isLoading && <Loader />}
-      {isLogging && <Logger {...logger} />}
+      {isLogging && <Logger {...logger} WhiteTheme={WhiteTheme}/>}
       <div
         className={` flex-1 justify-between items-center ${WhiteTheme ? "box-shadow bg-[#ffffff]" : "bg-[#1c1c24]"} rounded-[12px] w-fit p-4 mb-4`}
       >

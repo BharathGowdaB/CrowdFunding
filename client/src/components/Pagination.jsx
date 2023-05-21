@@ -8,6 +8,7 @@ const Pagination = ({
   objectPerPage = 10,
   maxPageList = 6,
   setCurrentPage,
+  WhiteTheme
 } = {}) => {
   const [pageStart, setPageStart] = useState(0);
   const [pageEnd, setPageEnd] = useState(6);
@@ -34,9 +35,8 @@ const Pagination = ({
         <div
           key={i}
           onClick={() => setCurrentPage(i)}
-          className={`${
-            currentPage == i && "current-page brightness-200"
-          } hover:text-white cursor-pointer hover:brightness-200`}
+          className={`${currentPage == i && "current-page brightness-200" } 
+          ${WhiteTheme ? "hover:text-black" : "hover:text-white"} cursor-pointer `}
         >
           {i + 1}
         </div>
@@ -64,12 +64,12 @@ const Pagination = ({
 
   useEffect(() => {
     loadPageList();
-  }, [pageStart, pageEnd, currentPage]);
+  }, [pageStart, pageEnd, currentPage, WhiteTheme]);
 
   return (
     <>
       {pageCount > 1 && (
-        <div className="flex gap-6 justify-center bg-[#ffffff] rounded-[10px] px-[16px] py-[8px] text-[#9ca3af] pagination-block">
+        <div className={`flex gap-6 justify-center ${WhiteTheme ? "bg-[#ffffff] text-[#b2b3bd] shadow-xl" : "bg-[#1c1c24] text-[#9ca3af]" } rounded-[10px] px-[16px] py-[8px]  pagination-block`}>
           {pageCount > maxPageList && (
             <img
               src={doubleArrow}

@@ -390,7 +390,7 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
   return (
     <>
       {isLoading && <Loader />}
-      {isLogging && <Logger {...logger} />}
+      {isLogging && <Logger {...logger} WhiteTheme={WhiteTheme}/>}
       {projectList.length == 0 && !paramAddress && (  <div className={`${WhiteTheme ? "box-shadow bg-[#ffffff] text-[#4f4f50]": "bg-[#1c1c24] text-white" } rounded-[12px] w-full p-4 mb-4 `}>
           {" "}
           No Project Found:
