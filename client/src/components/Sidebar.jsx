@@ -38,7 +38,7 @@ const Sidebar = ({ isStarter, WhiteTheme, setIsWhiteTheme }) => {
 
   return (
     <div className="flex justify-between items-center flex-col sticky top-5 h-[93vh]">
-      {isLogging && <Logger {...logger} />}
+      {isLogging && <Logger {...logger}  WhiteTheme={WhiteTheme}/>}
       <Link to="/">
         <Icon WhiteTheme={WhiteTheme} styles="w-[52px] h-[52px] bg-[#ffffff] box-shadow" imgUrl={logo} />
       </Link>

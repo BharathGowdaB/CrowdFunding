@@ -26,7 +26,7 @@ const Navbar = ({ isStarter, WhiteTheme }) => {
 
   return (
     <div className="flex md:flex-row flex-col-reverse justify-between mb-[32px] gap-6">
-      {isLogging && <Logger {...logger} />}
+      {isLogging && <Logger {...logger}  WhiteTheme={WhiteTheme}/>}
       <div className={`lg:flex-1 md:flex-1 flex flex-row max-w-[432px] min-w-[200px] py-2 pl-4 pr-2 h-[52px] ${WhiteTheme ? "bg-[#ffffff] text-black box-shadow-large" : "bg-[#1c1c24] text-white"} rounded-[100px]`}>
         <input
           id={"searchAddress"}
