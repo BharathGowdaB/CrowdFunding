@@ -2,7 +2,6 @@ export { default as Home } from './Home';
 export { default as CreateProject } from './CreateProject';
 export { default as Profile } from './Profile';
 export { default as UserDetails } from './UserDetails';
-export { default as ProjectDetails } from './ProjectDetails';
 export { default as User } from './User';
 export { default as Project } from './Project';
 export { default as Milestone } from './Milestone';

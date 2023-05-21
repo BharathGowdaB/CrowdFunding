@@ -4,7 +4,7 @@ import FundCard from './FundCard';
 import { loader } from '../assets';
 import { useNavigate } from 'react-router-dom';
 
-const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSortBy, emptyMessage = 'You have not created any project yet', clickURL } ) => { 
+const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSortBy, emptyMessage = 'You have not created any project yet', clickURL, WhiteTheme } ) => { 
   const navigate = useNavigate()
 
   const handleSetSortBy = (fieldName, value) => {
@@ -24,7 +24,7 @@ const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSort
   return (
     <div >
       <div className='flex align-top text-lg items-center justify-end min-h-[58px]'>
-        <h1 className="flex-1 font-epilogue font-semibold text-[18px] text-white text-left min-w-[150px]">{title} ({total})</h1>
+        <h1 className={`flex-1 font-epilogue font-semibold text-[18px] ${WhiteTheme ? "text-[#010101]": "text-white"} text-left min-w-[150px] `}>{title} ({total})</h1>
         {sortBy && 
         <div className='flex align-top text-lg items-center justify-end'>
           <div className='ml-[60px] w-fit flex align-center'>
@@ -36,7 +36,7 @@ const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSort
                 step="0.1"
                 className="hidden"
               />
-              <label htmlFor={'sortby-recent'} className={`text-[#808191] p-[8px] font-[700] ${sortBy.recent && 'text-[#16a34a] brightness-200'}`}>Recent </label>
+              <label htmlFor={'sortby-recent'} className={`text-[#808191] p-[8px] font-[700] hover:text-[#1dc071] ${sortBy.recent && 'text-[#1dc071]'}`}>Recent </label>
           </div>
           <div className='ml-[16px] w-fit flex align-center'>
               <input 
@@ -47,7 +47,7 @@ const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSort
                 step="0.1"
                 className="hidden"
               />
-              <label htmlFor={'sortby-popular'} className={`text-[#808191] p-[8px] font-[700] ${sortBy.popular && 'text-[#16a34a] brightness-200'}`}>Popular </label>
+              <label htmlFor={'sortby-popular'} className={`text-[#808191] p-[8px] font-[700] hover:text-[#1dc071] ${sortBy.popular && 'text-[#1dc071]'}`}>Popular </label>
           </div>
           <div className='ml-[16px] w-fit flex align-center'>
               <input 
@@ -58,7 +58,7 @@ const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSort
                 step="0.1"
                 className="hidden"
               />
-              <label htmlFor={'sortby-onlyCharity'} className={`text-[#808191] p-[8px] font-[700] ${sortBy.onlyCharity && 'text-[#16a34a] brightness-200'}`}>Charity </label>
+              <label htmlFor={'sortby-onlyCharity'} className={`text-[#808191] p-[8px] font-[700] hover:text-[#1dc071] ${sortBy.onlyCharity && 'text-[#1dc071]'}`}>Charity </label>
           </div>
           <div className='ml-[16px] w-fit flex align-center'>
               <input 
@@ -69,7 +69,7 @@ const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSort
                 step="0.1"
                 className="hidden"
               />
-              <label htmlFor={'sortby-onlyStartup'} className={`text-[#808191] p-[8px] font-[700] ${sortBy.onlyStartup && 'text-[#16a34a] brightness-200'}`}>Startup </label>
+              <label htmlFor={'sortby-onlyStartup'} className={`text-[#808191] p-[8px] font-[700] hover:text-[#1dc071] ${sortBy.onlyStartup && 'text-[#1dc071]'}`}>Startup </label>
           </div>
         </div>}
       </div>
@@ -85,11 +85,15 @@ const DisplayProjects = ({ title, total, isLoading, projectList, sortBy, setSort
           </p>
         )}
 
-        {!isLoading && projectList.length > 0 && projectList.map((projectAddress) => <FundCard 
-          key={projectAddress}
-          projectAddress = {projectAddress}
-          handleClick = { () => { navigate('/' + clickURL + '/' + projectAddress); }}
-        />)}
+        {!isLoading && projectList.length > 0 && 
+          projectList.map((projectAddress) => 
+            <FundCard 
+              key={projectAddress}
+              projectAddress = {projectAddress}
+              WhiteTheme={WhiteTheme}
+              handleClick = { () => { navigate('/' + clickURL + '/' + projectAddress);
+              }}
+            />)}
       </div>
     </div>
   )

@@ -50,7 +50,7 @@ export const starterNavlinks = [
   {
     name: 'milestone',
     imgUrl: withdraw,
-    link: '/milestone/0',
+    link: '/milestone/',
   },
   {
     name: 'profile',

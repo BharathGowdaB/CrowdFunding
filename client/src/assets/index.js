@@ -18,6 +18,7 @@ import failed from "./failed.png";
 import inProgress from "./inProgress.png";
 import inFunding from "./inFunding.png";
 import funded from "./funded.png";
+import blockchain from "./blockchain.jpg";
 
 export {
   tagType,
@@ -39,5 +40,6 @@ export {
   failed,
   inProgress,
   inFunding,
-  funded
+  funded,
+  blockchain
 };

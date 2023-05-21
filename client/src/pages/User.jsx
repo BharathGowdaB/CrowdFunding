@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 
 import { Sidebar, Navbar } from "../components";
-import { Home, CreateProject, Profile, UserDetails, ProjectDetails, Project, Milestone } from "./";
+import { Home, CreateProject, Profile, UserDetails, Project, Milestone } from "./";
 
 const User = () => {
   const navigate = useNavigate();
@@ -10,6 +10,7 @@ const User = () => {
   const [userAddress, setUserAddress] = useState('')
   const [isStarter, setIsStarter] = useState(true)
 
+  const [WhiteTheme, setIsWhiteTheme] = useState(true)
 
   useEffect(() => {
     if(!(userAddress)){
@@ -23,23 +24,23 @@ const User = () => {
   },[])
   
   return (
-    <div className="relative sm:-8 p-4 bg-[#13131a] min-h-screen flex flex-row">
+    <div className={`relative sm:-8 p-4 min-h-screen flex flex-row ${WhiteTheme ? "bg-[#f5fafe] text-[#010101]" : "bg-[#13131a]"}`}>
       <div className="sm:flex hidden mr-10 relative">
-        <Sidebar isStarter={isStarter}/>
+        <Sidebar isStarter={isStarter} setIsWhiteTheme={setIsWhiteTheme} WhiteTheme={WhiteTheme}/>
       </div>
 
       <div className="flex-1 max-sm:w-full max-w-[1280px] mx-auto sm:pr-5">
-        <Navbar isStarter={isStarter}/>
+        <Navbar isStarter={isStarter} WhiteTheme={WhiteTheme}/>
 
         <Routes>
-          <Route path="/home" element={<Home />} />
-          <Route path="/create-project" element={<CreateProject  isStarter={isStarter} userAddress={userAddress}/>} />
-          <Route path="/profile" element={<Profile isStarter={isStarter} userAddress={userAddress}/>} />
-          <Route path="/user/:userAddress" element={<UserDetails />} />
-          <Route path="/project/:projectAddress" element={<Project isStarter={isStarter} userAddress={userAddress}/>} />
-          <Route path="/project/" element={<Project isStarter={isStarter} userAddress={userAddress}/>} />
-          <Route path="/milestone/:projectAddress" element={<Milestone isStarter={isStarter} userAddress={userAddress}/>} />
-          <Route path="/project-details/:projectAddress" element={<ProjectDetails />} />
+          <Route path="/home" element={<Home WhiteTheme={WhiteTheme}/>} />
+          <Route path="/create-project" element={<CreateProject  isStarter={isStarter} userAddress={userAddress} WhiteTheme={WhiteTheme}/>} />
+          <Route path="/profile" element={<Profile isStarter={isStarter} userAddress={userAddress} WhiteTheme={WhiteTheme}/>} />
+          <Route path="/user/:userAddress" element={<UserDetails WhiteTheme={WhiteTheme}/>} />
+          <Route path="/project/:projectAddress" element={<Project isStarter={isStarter} userAddress={userAddress} WhiteTheme={WhiteTheme}/>} />
+          <Route path="/project/" element={<Project isStarter={isStarter} userAddress={userAddress} WhiteTheme={WhiteTheme}/>} />
+          <Route path="/milestone/:projectAddress" element={<Milestone isStarter={isStarter} userAddress={userAddress} WhiteTheme={WhiteTheme}/>} />
+          <Route path="/milestone/" element={<Milestone isStarter={isStarter} userAddress={userAddress} WhiteTheme={WhiteTheme}/>} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>

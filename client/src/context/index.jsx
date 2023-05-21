@@ -38,7 +38,7 @@ export const StateContextProvider = ({ children }) => {
     const errorCode = ErrorCode[reason.split(/execution reverted: /, 2)[1]] ? parseInt(reason.split(/execution reverted: /, 2)[1]) : 0
 
     const message = errorCode == 0 ? reason : ErrorCode[errorCode]
-   
+
     return { message, errorCode};
   }
 
@@ -185,11 +185,11 @@ export const StateContextProvider = ({ children }) => {
     return await charityContract.attach(projectAddress).releaseFunds()
   }
 
-  const startProject = async (projectAddress, userAddress) => {
-    if(userAddress) 
-      return await backerContract.attach(userAddress).updateProject(projectAddress, BackerOption.start, false)
-    else 
+  const startProject = async (projectAddress, userAddress, isStarter) => {
+    if(isStarter) 
       return await startupContract.attach(projectAddress).startProject()    
+    else 
+      return await backerContract.attach(userAddress).updateProject(projectAddress, BackerOption.start, false)
   }
 
   const abortProject = async (projectAddress , isCharity) => {

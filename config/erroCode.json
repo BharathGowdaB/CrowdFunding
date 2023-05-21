@@ -5,7 +5,7 @@
 
   "410" : "Starter Not Verified",
   "411" : "Starter Already Verified",
-  "416" : "Project Not Funded By Backer",
+  "415" : "Project Not Funded By Backer",
 
   "420" : "Email Pattern Error",
   "421" : "Password Pattern Error",

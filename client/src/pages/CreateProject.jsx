@@ -9,7 +9,7 @@ import { ErrorCode } from "../constants";
 
 import { useStateContext } from "../context";
 
-const CreateProject = ({ isStarter, userAddress }) => {
+const CreateProject = ({ isStarter, userAddress, WhiteTheme = false }) => {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +56,6 @@ const CreateProject = ({ isStarter, userAddress }) => {
               navigate('/home')
             },
           });
-
         } catch (error) {
           const res = processTransactionError(error);
 
@@ -77,7 +76,7 @@ const CreateProject = ({ isStarter, userAddress }) => {
   };
 
   return (
-    <div className="bg-[#1c1c24] flex justify-center items-center flex-col rounded-[10px] sm:p-10 p-4">
+    <div className={`flex justify-center items-center flex-col rounded-[10px] sm:p-10 p-4 ${WhiteTheme ? "bg-[#ffffff] box-shadow" : "bg-[#1c1d24]"}`}>
       {isLoading && <Loader />}
       {isLogging && <Logger {...logger} />}
       <div className="flex justify-center items-center p-[16px] sm:min-w-[380px] bg-[#3a3a43] rounded-[10px]">
@@ -94,6 +93,7 @@ const CreateProject = ({ isStarter, userAddress }) => {
             inputType="text"
             value={form.title}
             handleChange={(e) => handleFormFieldChange("title", e)}
+            WhiteTheme={WhiteTheme}
           />
           <label className="flex w-fit flex flex-col">
             <span className="font-epilogue font-medium text-[14px] leading-[22px] text-[#808191] mb-[10px]">
@@ -116,6 +116,7 @@ const CreateProject = ({ isStarter, userAddress }) => {
           isTextArea
           value={form.description}
           handleChange={(e) => handleFormFieldChange("description", e)}
+          WhiteTheme={WhiteTheme}
         />
 
         <div className="w-full flex justify-start items-center p-[16px] bg-[#8c6dfd]  rounded-[10px]">
@@ -132,6 +133,7 @@ const CreateProject = ({ isStarter, userAddress }) => {
             inputType="text"
             value={form.amountRequired}
             handleChange={(e) => handleFormFieldChange("amountRequired", e)}
+            WhiteTheme={WhiteTheme}
           />
           <FormField
             labelName="End Date *"
@@ -139,6 +141,7 @@ const CreateProject = ({ isStarter, userAddress }) => {
             inputType="date"
             value={form.deadline}
             handleChange={(e) => handleFormFieldChange("deadline", e)}
+            WhiteTheme={WhiteTheme}
           />
         </div>
 
@@ -148,13 +151,14 @@ const CreateProject = ({ isStarter, userAddress }) => {
           inputType="url"
           value={form.image}
           handleChange={(e) => handleFormFieldChange("image", e)}
+          WhiteTheme={WhiteTheme}
         />
 
         <div className="flex justify-center items-center mt-[40px]">
           <CustomButton
             btnType="submit"
             title="Submit new project"
-            styles="bg-[#116f41]"
+            styles={WhiteTheme ? "bg-[#1dc071]" : "bg-[#116f41]"}
           />
         </div>
       </form>

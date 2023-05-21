@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { DisplayProjects, Pagination, Loader } from '../components';
 import { useStateContext} from '../context';
 
-const Home = () => {
+const Home = ({WhiteTheme}) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const [projectList, setProjectList] = useState([]);
@@ -52,13 +52,15 @@ const Home = () => {
             sortBy = {sortBy}
             setSortBy = {setSortBy}
             emptyMessage = {'No Projects found'}
-            clickURL = 'project-details'
+            clickURL = 'project'
+            WhiteTheme = {WhiteTheme}
         />
         <Pagination
         total={projectCount}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         objectPerPage={maxObjectPerPage}
+        WhiteTheme = {WhiteTheme}
         />
     </>
     
