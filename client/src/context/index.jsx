@@ -42,7 +42,7 @@ export const StateContextProvider = ({ children }) => {
       })
 
       const transactionList = []
-      for(let i = 0 ; i< list.length ; i++) {
+      for(let i = list.length - 1; i >= 0 ; i--) {
         let log =  projectContract.interface.parseLog(list[i])
 
         const transaction = {
