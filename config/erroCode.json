@@ -2,6 +2,7 @@
   "401" : "Unauthorized",
   "402" : "Email Already Registered",
   "403" : "Email Not Registered",
+  "405" : "Public Address already used",
 
   "410" : "Starter Not Verified",
   "411" : "Starter Already Verified",

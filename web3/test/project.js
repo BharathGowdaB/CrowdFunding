@@ -63,13 +63,15 @@ describe("Project Contract:", async() => {
   })
 
   it("Should Backer Able to Refund(return) their funds", async() => {
-      await app.createBacker(backerDetails.name, 'testProjectRefund@gmail.com', backerDetails.password)
-      const backer = await app.authenticateBacker('testProjectRefund@gmail.com', backerDetails.password);
+      const [owner, other1, other2, other3, other4] = await ethers.getSigners()
+
+      await app.connect(other4).createBacker(backerDetails.name, 'testProjectRefund@gmail.com', backerDetails.password)
+      const backer = await app.connect(other4).authenticateBacker('testProjectRefund@gmail.com', backerDetails.password);
 
       const fundValue = constants.fundingDenomination.realValue * 2
       const beforeAmountRaised = await Project.attach(charityAddress).amountRaised()
 
-      await Backer.attach(backer).fundProject(charityAddress, {value: fundValue})
+      await Backer.connect(other4).attach(backer).fundProject(charityAddress, {value: fundValue})
 
       expect(await Project.attach(charityAddress).amountRaised()).equals( parseInt(beforeAmountRaised) + fundValue)
 
@@ -82,13 +84,11 @@ describe("Project Contract:", async() => {
 
       expect(await Project.attach(charityAddress).amountRaised()).equals( parseInt(beforeAmountRaised) + fundValue + fundValue2)
 
-      const [owner, others] = await ethers.getSigners()
-
       const backerBalance =  await ethers.provider.getBalance(owner.address)
       const backerFunds = await  Project.attach(charityAddress).backers(backer)
 
       expect(await  Project.attach(charityAddress).backers(backer)).equals(fundValue)
-      await Backer.attach(backer).updateProject(charityAddress, BackerOption.refund, false)
+      await Backer.connect(other4).attach(backer).updateProject(charityAddress, BackerOption.refund, false)
       expect(await  Project.attach(charityAddress).backers(backer)).equals(0)
 
       expect(await Project.attach(charityAddress).amountRaised()).equals( parseInt(beforeAmountRaised)  + fundValue2)
@@ -96,19 +96,20 @@ describe("Project Contract:", async() => {
   })
 
   it("Should Not Backer Able to Refund funds after funding period is over", async() => {
-    await app.createBacker(backerDetails.name, 'testProjectRefundAfter@gmail.com', backerDetails.password)
-    const backer = await app.authenticateBacker('testProjectRefundAfter@gmail.com', backerDetails.password);
+    const [owner, other1, other2, other3, other4, other5] = await ethers.getSigners()
+    await app.connect(other5).createBacker(backerDetails.name, 'testProjectRefundAfter@gmail.com', backerDetails.password)
+    const backer = await app.connect(other5).authenticateBacker('testProjectRefundAfter@gmail.com', backerDetails.password);
 
     const fundValue = constants.fundingDenomination.realValue * 2
     const beforeAmountRaised = await Project.attach(charityAddress).amountRaised()
 
-    await Backer.attach(backer).fundProject(charityAddress, {value: fundValue})
+    await Backer.connect(other5).attach(backer).fundProject(charityAddress, {value: fundValue})
 
     expect(await Project.attach(charityAddress).amountRaised()).equals( parseInt(beforeAmountRaised) + fundValue)
 
     await Charity.attach(charityAddress).setProjectState(ProjectState.ended, 0);
 
-    await expect(Backer.attach(backer).updateProject(charityAddress, BackerOption.refund, false)).to.be.reverted
+    await expect(Backer.connect(other5).attach(backer).updateProject(charityAddress, BackerOption.refund, false)).to.be.reverted
   
   })
 })
@@ -151,23 +152,23 @@ describe("Charity Contract:", function () {
 
   it("Should Starter Be Able to Abort Project while in Funding State", async() => {
     
-    const [owner, other] = await ethers.getSigners()
+    const [owner, other, other2, other3, other4 , other5, other6] = await ethers.getSigners()
     
-    await app.connect(other).createBacker(backerDetails.name, 'testAbortProject@gmail.com', backerDetails.password)
-    const backer = await app.connect(other).authenticateBacker('testAbortProject@gmail.com', backerDetails.password);
+    await app.connect(other6).createBacker(backerDetails.name, 'testAbortProject@gmail.com', backerDetails.password)
+    const backer = await app.connect(other6).authenticateBacker('testAbortProject@gmail.com', backerDetails.password);
 
     const fundValue = constants.fundingDenomination.realValue * 20
 
     await Charity.attach(charityAddress).setProjectState(ProjectState.inFunding, Date.now() + 1000000);
-    await Backer.connect(other).attach(backer).fundProject(charityAddress, {value: fundValue})
+    await Backer.connect(other6).attach(backer).fundProject(charityAddress, {value: fundValue})
     
     expect((await Charity.attach(charityAddress).getProjectDetails()).state).equals(ProjectState.inFunding)
     
-    const backerBalance = await ethers.provider.getBalance(other.address)
+    const backerBalance = await ethers.provider.getBalance(other6.address)
     await Charity.attach(charityAddress).abortProject();
     
     expect((await Charity.attach(charityAddress).getProjectDetails()).state).equals(ProjectState.aborted)
-    expect(await ethers.provider.getBalance(other.address) ).equals(BigInt(backerBalance) + BigInt(fundValue))
+    expect(await ethers.provider.getBalance(other6.address) ).equals(BigInt(backerBalance) + BigInt(fundValue))
   })
   
   it("Should Not Starter Be Able to Abort Project After in Funding State", async() => {
@@ -197,15 +198,15 @@ describe("Startup Contract:", function () {
   })
 
   it("Should Project to Started On successfully raising funds", async() => {
-    const [owner, other] = await ethers.getSigners()
+    const [owner, other1, other2, ohter3, other4, other5, other6, other7] = await ethers.getSigners()
     
-    await app.connect(other).createBacker(backerDetails.name, 'testStartStartupProject@gmail.com', backerDetails.password)
-    const backer = await app.connect(other).authenticateBacker('testStartStartupProject@gmail.com', backerDetails.password);
+    await app.connect(other7).createBacker(backerDetails.name, 'testStartStartupProject@gmail.com', backerDetails.password)
+    const backer = await app.connect(other7).authenticateBacker('testStartStartupProject@gmail.com', backerDetails.password);
 
     const fundValue = projectDetails.amountRequired
 
     expect((await Charity.attach(startupAddress).getProjectDetails()).state).equals(ProjectState.inFunding)
-    await Backer.connect(other).attach(backer).fundProject(startupAddress, {value: fundValue})
+    await Backer.connect(other7).attach(backer).fundProject(startupAddress, {value: fundValue})
     
     await Startup.attach(startupAddress).setProjectState(ProjectState.inFunding, 0);
 
@@ -215,23 +216,23 @@ describe("Startup Contract:", function () {
   })
 
   it("Should Reject Project on  un-successful raising funds", async() => {
-    const [owner, other] = await ethers.getSigners()
+    const [owner, other1, other2, ohter3, other4, other5, other6, other7, other8] = await ethers.getSigners()
     
-    await app.connect(other).createBacker(backerDetails.name, 'testRejectStartupProject@gmail.com', backerDetails.password)
-    const backer = await app.connect(other).authenticateBacker('testRejectStartupProject@gmail.com', backerDetails.password);
+    await app.connect(other8).createBacker(backerDetails.name, 'testRejectStartupProject@gmail.com', backerDetails.password)
+    const backer = await app.connect(other8).authenticateBacker('testRejectStartupProject@gmail.com', backerDetails.password);
 
     const fundValue = projectDetails.amountRequired - constants.fundingDenomination.realValue
 
     expect((await Charity.attach(startupAddress).getProjectDetails()).state).equals(ProjectState.inFunding)
-    await Backer.connect(other).attach(backer).fundProject(startupAddress, {value: fundValue})
+    await Backer.connect(other8).attach(backer).fundProject(startupAddress, {value: fundValue})
     
     await Startup.attach(startupAddress).setProjectState(ProjectState.inFunding, 0);
 
-    const backerBalance = await ethers.provider.getBalance(other.address)
+    const backerBalance = await ethers.provider.getBalance(other8.address)
     await Startup.attach(startupAddress).startProject();
     
     expect((await Startup.attach(startupAddress).getProjectDetails()).state).equals(ProjectState.rejected)
-    expect(await ethers.provider.getBalance(other.address) ).equals(BigInt(backerBalance) + BigInt(fundValue)) 
+    expect(await ethers.provider.getBalance(other8.address) ).equals(BigInt(backerBalance) + BigInt(fundValue)) 
   })
 
   it("Should Not Start or Reject Project By Others", async() => {
@@ -244,23 +245,23 @@ describe("Startup Contract:", function () {
 
   it("Should Starter Be Able to Abort Project while in Funding State", async() => {
     
-    const [owner, other] = await ethers.getSigners()
+    const [owner,  other1, other2, ohter3, other4, other5, other6, other7, other8, other9, other10, other11] = await ethers.getSigners()
     
-    await app.connect(other).createBacker(backerDetails.name, 'testAbortStartupProject@gmail.com', backerDetails.password)
-    const backer = await app.connect(other).authenticateBacker('testAbortStartupProject@gmail.com', backerDetails.password);
+    await app.connect(other11).createBacker(backerDetails.name, 'testAbortStartupProject@gmail.com', backerDetails.password)
+    const backer = await app.connect(other11).authenticateBacker('testAbortStartupProject@gmail.com', backerDetails.password);
 
     const fundValue = constants.fundingDenomination.realValue * 20
 
     await Startup.attach(startupAddress).setProjectState(ProjectState.inFunding, Date.now() + 1000000);
-    await Backer.connect(other).attach(backer).fundProject(startupAddress, {value: fundValue})
+    await Backer.connect(other11).attach(backer).fundProject(startupAddress, {value: fundValue})
     
     expect((await Startup.attach(startupAddress).getProjectDetails()).state).equals(ProjectState.inFunding)
     
-    const backerBalance = await ethers.provider.getBalance(other.address)
+    const backerBalance = await ethers.provider.getBalance(other11.address)
     await Startup.attach(startupAddress).abortProject();
     
     expect((await Startup.attach(startupAddress).getProjectDetails()).state).equals(ProjectState.aborted)
-    expect(await ethers.provider.getBalance(other.address) ).equals(BigInt(backerBalance) + BigInt(fundValue))
+    expect(await ethers.provider.getBalance(other11.address) ).equals(BigInt(backerBalance) + BigInt(fundValue))
   })
   
   it("Should Not Starter Be Able to Abort Project After in Funding State", async() => {
@@ -279,38 +280,38 @@ describe("Startup Contract:", function () {
   })
 
   it("Should End Project By Sending Rewards", async() => {
-    const [owner, other1, other2] = await ethers.getSigners()
+    const [owner, other1, other2, other3, other4, other5, other6, other7, other8, other9, other10] = await ethers.getSigners()
     
-    await app.connect(other1).createBacker(backerDetails.name, 'testEndStartupProject@gmail.com', backerDetails.password)
-    const backer1 = await app.connect(other1).authenticateBacker('testEndStartupProject@gmail.com', backerDetails.password);
+    await app.connect(other9).createBacker(backerDetails.name, 'testEndStartupProject@gmail.com', backerDetails.password)
+    const backer1 = await app.connect(other9).authenticateBacker('testEndStartupProject@gmail.com', backerDetails.password);
 
     const fundValue1 = constants.fundingDenomination.realValue * 20
 
 
-    await app.connect(other2).createBacker(backerDetails.name, 'testEndStartupProject2@gmail.com', backerDetails.password)
-    const backer2 = await app.connect(other2).authenticateBacker('testEndStartupProject2@gmail.com', backerDetails.password);
+    await app.connect(other10).createBacker(backerDetails.name, 'testEndStartupProject2@gmail.com', backerDetails.password)
+    const backer2 = await app.connect(other10).authenticateBacker('testEndStartupProject2@gmail.com', backerDetails.password);
 
     const fundValue2 = constants.fundingDenomination.realValue * 40
 
     await Startup.attach(startupAddress).setProjectState(ProjectState.inFunding, Date.now() + 1000000);
-    await Backer.connect(other1).attach(backer1).fundProject(startupAddress, {value: fundValue1})
-    await Backer.connect(other2).attach(backer2).fundProject(startupAddress, {value: fundValue2})
+    await Backer.connect(other9).attach(backer1).fundProject(startupAddress, {value: fundValue1})
+    await Backer.connect(other10).attach(backer2).fundProject(startupAddress, {value: fundValue2})
     
     expect(await Startup.attach(startupAddress).amountRaised()).equals(fundValue1 + fundValue2)
     expect((await Startup.attach(startupAddress).getProjectDetails()).state).equals(ProjectState.inFunding)
     
     await Startup.attach(startupAddress).setProjectState(ProjectState.inExecution, 0);
 
-    await Backer.connect(other1).attach(backer1).updateProject(startupAddress, BackerOption.end, true);
-    const backerBalance1 = await ethers.provider.getBalance(other1.address)
+    await Backer.connect(other9).attach(backer1).updateProject(startupAddress, BackerOption.end, true);
+    const backerBalance1 = await ethers.provider.getBalance(other9.address)
     
     await Startup.attach(startupAddress).setProjectState(ProjectState.inExecution, 0 , {value : (fundValue1 + fundValue2) * 3})
     expect(await ethers.provider.getBalance(startupAddress)).equals((fundValue1 + fundValue2) * 4)
 
-    await Backer.connect(other2).attach(backer2).updateProject(startupAddress, BackerOption.end, true);
+    await Backer.connect(other10).attach(backer2).updateProject(startupAddress, BackerOption.end, true);
 
     expect(await ethers.provider.getBalance(startupAddress)).equals(0)
-    expect(await ethers.provider.getBalance(other1.address)).equals(BigInt(backerBalance1) + BigInt(fundValue1 * 4)) 
+    expect(await ethers.provider.getBalance(other9.address)).equals(BigInt(backerBalance1) + BigInt(fundValue1 * 4)) 
   })
 })
 

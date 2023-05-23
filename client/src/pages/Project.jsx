@@ -44,6 +44,8 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
   const [fundValue, setFundValue] = useState(0);
   const [logMessage, setLogMessage] = useState("");
 
+  const [lastTransactions, setLastTransactions] = useState([])
+
   const [currentVote, setCurrentVote] = useState({
     votes: 0,
     maxVotes: 0,
@@ -65,6 +67,7 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
     fundProject,
     abortProject,
     refundBackerFunds,
+    getLastNTransactions
   } = useStateContext();
 
   const [form, setForm] = useState({
@@ -359,6 +362,7 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
       if (!details.isCharity) {
         await fetchProjectVote();
       }
+
     } catch (error) {
       const { message } = processViewError(error);
       setLogger({
@@ -373,9 +377,19 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
     setIsLoading(false);
   };
 
+  const fetchLastTransactions = async() =>  {
+    let list = await getLastNTransactions(projectAddress, 10)
+    console.log(list)
+    setLastTransactions(list)
+  }
   useEffect(() => {
-    if (projectAddress && projectAddress != ethers.constants.AddressZero)
+    if (projectAddress && projectAddress != ethers.constants.AddressZero){
       fetchLogMessages();
+
+      fetchLastTransactions();
+      
+    }
+      
   }, [projectAddress]);
 
   useEffect(() => {
@@ -388,9 +402,11 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
   }, [projectAddress, logger]);
 
   return (
-    <>
+    <div className="flex gap-4">
+    
       {isLoading && <Loader />}
       {isLogging && <Logger {...logger} WhiteTheme={WhiteTheme}/>}
+      <div className="flex-1">
       {projectList.length == 0 && !paramAddress && (  <div className={`${WhiteTheme ? "box-shadow bg-[#ffffff] text-[#4f4f50]": "bg-[#1c1c24] text-white" } rounded-[12px] w-full p-4 mb-4 `}>
           {" "}
           No Project Found:
@@ -441,7 +457,7 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
                     <div className="flex text-white font-[600] text-[16px] items-center">
                       <img src={inFunding} title="In FUnding State"  alt="In FUnding State" className="w-[36px] h-[36px] object-contain"/>
                       <div className={`p-[10px] pl-[8px] min-h-[36px] ${WhiteTheme? "text-[#4f4f50]" : "text-[#b2b3bd]"}`}>
-                        In Funding State
+                        {projectDetails.daysLeft != "00"  ? "In Funding State": "Funding Ended"}
                       </div>
                     </div>
                   )}
@@ -559,7 +575,7 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
               />
             </div>
           )}
-          {projectDetails.state == 2 && !isStarter && (
+          {projectDetails.state == 2 &&  (
             <div className="flex gap-4 mb-4 justify-end items-center">
               <div className="text-[#4f4f50]">
                 Current Termination Request:{" "}
@@ -569,7 +585,7 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
                   ) / 100
                 } %`}</span>
               </div>
-              {!isTerminate && (
+              {!isTerminate && !isStarter && (
                 <CustomButton
                   btnType="button"
                   title={"Terminate Project"}
@@ -577,7 +593,7 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
                   handleClick={() => handleEndProject(true)}
                 />
               )}
-              {isTerminate && (
+              {isTerminate && !isStarter && (
                 <CustomButton
                   btnType="button"
                   title={"Recall Termination"}
@@ -801,7 +817,22 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
           </div>{" "}
         </>
       )}
-    </>
+      </div>
+      <div className="w-[300px] flex flex-col gap-4">
+        {lastTransactions.map((log) => {
+          return (<div
+          key={log.time}
+          className={`flex flex-col px-[8px] gap-1 py-[14px]  ${WhiteTheme ? "shadow bg-[#ffffff]" : "bg-[#1c1c24]"} ${log.isdebit ? "border-r-8 border-[#1dc071]" : "border-l-8 border-[#8c6dfd]"}`}
+          >
+            <div className={`text-[12px] ${WhiteTheme ? "text-black" : "text-[#b2b3bd]"}`}>{log.address} </div>
+            <div className={`flex justify-between text-[12px] ${WhiteTheme ? "text-black" : "text-[#b2b3bd]"} `}> 
+              <div className={`text-[14px] font-bold`}>{log.value + " ETH"}</div>
+              <div>{log.time}</div>
+            </div>
+            </div>)
+        })}
+      </div>
+    </div>
   );
 };
 

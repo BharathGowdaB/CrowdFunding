@@ -202,7 +202,7 @@ const MilestoneCard = ({
               className="w-[36px] h-[36px] object-contain"
             />
             <div className={`p-[10px] pl-[8px] min-h-[36px] ${WhiteTheme? "text-[#4f4f50]" : "text-[#b2b3bd]"}`}>
-              In Voting State
+              {milestone.startTime + 86400 < Date.now() ? "In Voting State" : "Voting Ended"}
             </div>
           </div>
         )}

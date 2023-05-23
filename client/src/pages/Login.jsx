@@ -84,7 +84,7 @@ const Login = ({WhiteTheme = true}) => {
           onSubmit={handleSubmit}
           className="w-[300px] flex flex-col gap-[24px]"
         >
-          <h1 className="self-center text-[#1dc071] font-[700] text-[32px]">
+          <h1 className="self-center text-[#116f41] font-[700] text-[32px]">
             Crowdfunding
           </h1>
           <div className="relative flex gap-[16px] text-[#4f4f50] text-[18px] text-center">
@@ -123,7 +123,7 @@ const Login = ({WhiteTheme = true}) => {
               Backer{" "}
             </label>
             <div
-              className={`z-1 absolute p-4 rounded-[24px] w-[48%] bg-[#1dc071] left-0 transition-[left] duration-700 ${
+              className={`z-1 absolute p-4 rounded-[24px] w-[48%] bg-[#116f41] left-0 transition-[left] duration-700 ${
                 !form.isStarter && "left-[52%]"
               } `}
             ></div>

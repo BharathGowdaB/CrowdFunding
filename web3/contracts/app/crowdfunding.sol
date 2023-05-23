@@ -19,6 +19,8 @@ contract Crowdfunding{
     Database public db;
     address public admin;
 
+    mapping(address => bool) internal addressUsedStater;
+    mapping(address => bool) internal addressUsedBacker;
     mapping(string => address) public backerList;
     mapping(string => address) public starterList;
     mapping(address => VerificationData) private verifiedList;
@@ -39,10 +41,12 @@ contract Crowdfunding{
             require(Validator(validatorAddress).isEmail(_email), '420');
             require(Validator(validatorAddress).isPassword(_password), '421');
             require(Validator(validatorAddress).isTitle(name), '422');
-            
+
+            require(!addressUsedStater[msg.sender], "405");
             require(starterList[_email] == address(0), "402");
 
             starterList[_email] = address(new Starter(msg.sender, name, _email, _password));
+            addressUsedStater[msg.sender] = true;
             db.addStarter(starterList[_email]);
 
             return starterList[_email];
@@ -56,9 +60,15 @@ contract Crowdfunding{
     
     function createBacker(string memory name, string memory _email, string memory _password) 
         public returns(address) {
+            require(Validator(validatorAddress).isEmail(_email), '420');
+            require(Validator(validatorAddress).isPassword(_password), '421');
+            require(Validator(validatorAddress).isTitle(name), '422');
+
             require(backerList[_email] == address(0), "402");
+            require(!addressUsedBacker[msg.sender], "405");
 
             backerList[_email] = BackerLamda(backerLamdaAddress).createBacker(msg.sender, name, _email, _password);
+            addressUsedBacker[msg.sender] = true;
 
             return backerList[_email];
         }

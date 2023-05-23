@@ -73,12 +73,13 @@ describe('Database Contract:', async() => {
   })
 
   it('Should Return Only Charity Projects', async() => {
-    await app.createStarter(starterDetails.name, 'testGetOnlyCharityProject@gmail.com' , starterDetails.password)
-    const user = await app.authenticateStarter('testGetOnlyCharityProject@gmail.com' , starterDetails.password)
+    const [owner, other1, other2, other3] = await ethers.getSigners()
+    await app.connect(other1).createStarter(starterDetails.name, 'testGetOnlyCharityProject@gmail.com' , starterDetails.password)
+    const user = await app.connect(other1).authenticateStarter('testGetOnlyCharityProject@gmail.com' , starterDetails.password)
 
     await app.verifyStarter(user, VerificationState.verified)
 
-    await createProjects(user, 3 , true)
+    await createProjects(user, 3 , true, other1)
     
     const [list, count] = await db.getProjectList({skip: 0, onlyCharity: true})
 
@@ -99,9 +100,10 @@ describe('Database Contract:', async() => {
   })
 
   it('Should Return Popular Projects', async() => {
+    const [owner, other1, other2, other3] = await ethers.getSigners()
 
-    await app.createStarter(starterDetails.name, 'testPopularProjectsList@gmail.com' , starterDetails.password)
-    const user = await app.authenticateStarter('testPopularProjectsList@gmail.com' , starterDetails.password)
+    await app.connect(other2).createStarter(starterDetails.name, 'testPopularProjectsList@gmail.com' , starterDetails.password)
+    const user = await app.connect(other2).authenticateStarter('testPopularProjectsList@gmail.com' , starterDetails.password)
 
     const DatabaseMock = await ethers.getContractFactory("DatabaseMock");
     const databaseMock  = await DatabaseMock.deploy();
@@ -173,14 +175,14 @@ describe('Database Contract:', async() => {
   it("Should Not Be Able to Log Messages By: Other users", async() => {
     const [projaddress, count] = await Starter.attach(starterAddress).getProjectList(0)
 
-    const [owner, otheraccounts] = await ethers.getSigners()
+    const [owner, other1, other2, other3] = await ethers.getSigners()
 
-    await app.connect(otheraccounts).createBacker(backerDetails.name, 'testLogMessageOthers@gmail.com', backerDetails.password)
-    const backer = await app.connect(otheraccounts).authenticateBacker('testLogMessageOthers@gmail.com', backerDetails.password);
+    await app.connect(other3).createBacker(backerDetails.name, 'testLogMessageOthers@gmail.com', backerDetails.password)
+    const backer = await app.connect(other3).authenticateBacker('testLogMessageOthers@gmail.com', backerDetails.password);
 
     const [log, logCount] = await db.getLogMessage(projaddress, 0)
 
-    await expect( db.connect(otheraccounts).addLogMessage(projaddress, 'logging 3')).to.be.reverted
+    await expect( db.connect(other3).addLogMessage(projaddress, 'logging 3')).to.be.reverted
 
   })
 })

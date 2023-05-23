@@ -13,6 +13,7 @@ import { milestoneLamdaAddress } from '../utils/address.sol';
 import { MilestoneLamda } from '../app/lamda.sol';
 
 contract Startup is Project {
+    
     modifier onlyCreator {
         require(id == msg.sender, "401");
         _;
@@ -37,6 +38,7 @@ contract Startup is Project {
             amountRaised += msg.value;
             backers[msg.sender] += msg.value;
 
+            emit projectFunded(msg.sender, msg.value, block.timestamp);
             for(uint i = 0 ; i < backersList.length ; i++){
                 if(backersList[i] == msg.sender) return;
             }
@@ -69,6 +71,8 @@ contract Startup is Project {
                 (bool sent,) = payable(id).call{value: details.fundsRequired}("");
                 require(sent == true, '500');
                 milestone.changeState(MilestoneState.inExecution);
+
+                emit fundsReleased(starterId, details.fundsRequired, block.timestamp);
             }
             else{
                 milestone.changeState(MilestoneState.rejected);
@@ -84,6 +88,8 @@ contract Startup is Project {
             require(details.returnAmount == msg.value, "456");
 
             milestone.changeState(MilestoneState.ended);
+
+            emit projectFunded(starterId, details.returnAmount, block.timestamp );
         }
     
     function abortProject() 
@@ -100,6 +106,8 @@ contract Startup is Project {
             for(uint i = 0 ; i < backersList.length ; i++){
                 (bool sent,) = payable(User(backersList[i]).id()).call{value : (multiplier * backers[backersList[i]]) / divider}("");
                 require(sent == true, '500');
+                
+                emit fundsReleased(backersList[i], backers[backersList[i]], block.timestamp);
                 backers[backersList[i]] = 0;
             }
         }

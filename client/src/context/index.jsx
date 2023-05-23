@@ -1,9 +1,8 @@
-import React, { useContext, createContext, useState, useEffect } from 'react';
+import React, { useContext, createContext } from 'react';
 
 import milestoneABI from "../../../abi/milestone.json";
 import { ethers } from 'ethers';
 import { Address, ABI , ErrorCode } from '../constants/index';
-import { User } from '../pages';
 
 const StateContext = createContext();
 
@@ -31,6 +30,39 @@ export const StateContextProvider = ({ children }) => {
   const getBalance = async (address) => {
     const balance =  await provider.getBalance(address)
     return ethers.utils.formatUnits(balance, 18)
+  }
+
+  const getLastNTransactions = async (address, n = 10) => {
+    try {
+      
+      const list = await provider.getLogs({
+        address,
+        fromBlock: 0,
+        toBlock: 'latest'
+      })
+
+      const transactionList = []
+      for(let i = 0 ; i< list.length ; i++) {
+        let log =  projectContract.interface.parseLog(list[i])
+
+        const transaction = {
+          value : ethers.utils.formatUnits(log.args[1], 18),
+          address: log.args[0],
+           time: new Date(parseInt(log.args[2]) * 1000).toISOString()
+        }
+   
+        if(log.name == "fundsReleased") {
+          transaction.isdebit = true
+        }
+
+        transactionList.push(transaction)
+      }
+     
+      return transactionList
+    } catch (error) {
+        console.error('Error retrieving transaction history:', error);
+      return []
+    }
   }
 
   const processTransactionError =  (error) => {
@@ -118,7 +150,7 @@ export const StateContextProvider = ({ children }) => {
 
   const getProjectVote = async (userAddress, projectAddress) => {
     const res =  {
-      isTerminate: await startupContract.attach(projectAddress).endProjectVotes(userAddress),
+      isTerminate: await startupContract.attach(projectAddress).endProjectVotes(userAddress || ethers.constants.AddressZero),
       votes: await startupContract.attach(projectAddress).cumulativeVotes(),
       maxVotes: await startupContract.attach(projectAddress).amountRaised()
     } 
@@ -253,6 +285,7 @@ export const StateContextProvider = ({ children }) => {
     <StateContext.Provider
       value={{ 
         getBalance,
+        getLastNTransactions,
         processTransactionError,
         processViewError,
         getPublicAddress,

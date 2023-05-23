@@ -31,7 +31,10 @@ async function deployContract() {
     return {app, db, charityLamda, startupLamda,milestoneLamda,backerLamda, validator}
 }
 
-async function createProjects(starterAddress, n, isCharity = false) {
+async function createProjects(starterAddress, n, isCharity = false, userAddress = undefined ) {
+    const [owner] = await ethers.getSigners()
+    if(!userAddress) userAddress = owner
+
     const Starter = await ethers.getContractFactory('Starter')
 
     const project = {
@@ -42,7 +45,7 @@ async function createProjects(starterAddress, n, isCharity = false) {
         isCharity 
       }
     for (i = 0 ; i < n ; i++){
-        await Starter.attach(starterAddress).createProject(i + project.title , project.description, project.amountRequired, project.fundingDuration, project.isCharity, "test" )
+        await Starter.connect(userAddress).attach(starterAddress).createProject(i + project.title , project.description, project.amountRequired, project.fundingDuration, project.isCharity, "test" )
     }
 }
 

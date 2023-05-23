@@ -7,7 +7,9 @@ import { ProjectState , ProjectDetails} from '../utils/definitions.sol';
 import { minFundingPeriod } from '../utils/constants.sol';
 
 contract Project {
- 
+    event projectFunded(address, uint, uint);
+    event fundsReleased(address, uint, uint);
+
     address public id;
     address public starterId;
     uint public amountRaised;
@@ -55,6 +57,8 @@ contract Project {
             require(sent== true, '500');
 
             amountRaised -= backers[msg.sender];
+            emit fundsReleased(msg.sender, backers[msg.sender], block.timestamp );
+
             backers[msg.sender] = 0;
         }
 
@@ -67,6 +71,7 @@ contract Project {
             amountRaised += msg.value;
             backers[msg.sender] += msg.value;
 
+            emit projectFunded(msg.sender, msg.value, block.timestamp);
             for(uint i = 0 ; i < backersList.length ; i++){
                 if(backersList[i] == msg.sender) return;
             }
