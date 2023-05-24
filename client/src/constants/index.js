@@ -45,12 +45,12 @@ export const starterNavlinks = [
   {
     name: 'project',
     imgUrl: payment,
-    link: '/project/0',
+    link: '/project/',
   },
   {
     name: 'milestone',
     imgUrl: withdraw,
-    link: '/milestone/0',
+    link: '/milestone/',
   },
   {
     name: 'profile',

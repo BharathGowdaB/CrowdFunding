@@ -9,18 +9,23 @@ import { User } from '../user/user.sol';
 import { ProjectState, MilestoneState , MilestoneDetails} from '../utils/definitions.sol';
 import { votingPeriod, fundingDenomination} from '../utils/constants.sol';
 
+import { milestoneLamdaAddress } from '../utils/address.sol';
+import { MilestoneLamda } from '../app/lamda.sol';
 
 contract Startup is Project {
+    
     modifier onlyCreator {
         require(id == msg.sender, "401");
         _;
     }
     address[] internal milestoneList;
-    mapping(address => bool) endProjectVotes;
+    mapping(address => bool) public endProjectVotes;
+    uint public cumulativeVotes;
 
     constructor(address _starterId, string memory _title, string memory _description, uint _amountRequired, uint _fundingDuration)
         Project(_starterId, _title, _description , _amountRequired, _fundingDuration, false) { 
             require(_amountRequired % fundingDenomination == 0, "432");
+            cumulativeVotes = 0;
         }
 
     function addBacker() 
@@ -33,6 +38,7 @@ contract Startup is Project {
             amountRaised += msg.value;
             backers[msg.sender] += msg.value;
 
+            emit projectFunded(msg.sender, msg.value, block.timestamp);
             for(uint i = 0 ; i < backersList.length ; i++){
                 if(backersList[i] == msg.sender) return;
             }
@@ -43,7 +49,7 @@ contract Startup is Project {
     function addMilestone(string memory _title, string memory _description, uint _fundsRequired, uint _returnAmount) 
         public onlyCreator returns(address) {
             require(state == ProjectState.inExecution, "448");
-            milestoneList.push(address(new Milestone(_title, _description, _fundsRequired, amountRaised, _returnAmount)));
+            milestoneList.push(MilestoneLamda(milestoneLamdaAddress).createMilestone(_title, _description, _fundsRequired, amountRaised, _returnAmount));
             return (milestoneList[milestoneList.length - 1]);
         }
 
@@ -65,6 +71,8 @@ contract Startup is Project {
                 (bool sent,) = payable(id).call{value: details.fundsRequired}("");
                 require(sent == true, '500');
                 milestone.changeState(MilestoneState.inExecution);
+
+                emit fundsReleased(starterId, details.fundsRequired, block.timestamp);
             }
             else{
                 milestone.changeState(MilestoneState.rejected);
@@ -79,8 +87,9 @@ contract Startup is Project {
             require(details.state == MilestoneState.inExecution, '455');
             require(details.returnAmount == msg.value, "456");
 
-            amountRaised += msg.value;
             milestone.changeState(MilestoneState.ended);
+
+            emit projectFunded(starterId, details.returnAmount, block.timestamp );
         }
     
     function abortProject() 
@@ -97,12 +106,15 @@ contract Startup is Project {
             for(uint i = 0 ; i < backersList.length ; i++){
                 (bool sent,) = payable(User(backersList[i]).id()).call{value : (multiplier * backers[backersList[i]]) / divider}("");
                 require(sent == true, '500');
+                
+                emit fundsReleased(backersList[i], backers[backersList[i]], block.timestamp);
                 backers[backersList[i]] = 0;
             }
         }
 
     function startProject()
-        public onlyCreator {
+        public {
+            require(msg.sender == id || backers[msg.sender] > 0, '401');
             require(state == ProjectState.inFunding, "448");
             require(block.timestamp >= endTime, "440");
 
@@ -122,12 +134,13 @@ contract Startup is Project {
 
             endProjectVotes[msg.sender] = _vote;
 
-            uint count = 0;
-            for(uint i = 0 ; i < backersList.length ; i++) {
-                if(endProjectVotes[backersList[i]]) count += backers[backersList[i]];
+            if(_vote){
+                cumulativeVotes += backers[msg.sender];
+            } else {
+                cumulativeVotes -= backers[msg.sender];
             }
 
-            if( 2 * count > amountRequired) {
+            if( 2 * cumulativeVotes > amountRequired) {
                 returnBackersFunds(address(this).balance, amountRaised);
                 state = ProjectState.ended;
             }

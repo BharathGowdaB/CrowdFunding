@@ -10,12 +10,9 @@ import { Milestone } from '../project/milestone.sol';
 
 import { dbAddress } from '../utils/address.sol';
 
+import { BackerOption } from "../utils/definitions.sol";
 
 contract Backer is User{
-    modifier onlyCreator {
-        require(id == msg.sender, "401");
-        _;
-    }
 
     constructor(address _address, string memory _name, string memory _email, string memory _password)
         User(_address, _name, _email, _password){}
@@ -34,24 +31,20 @@ contract Backer is User{
             projectList.push(_projectAddress);
         }
     
-    function returnProjectFunds(address _projectAddress) 
-        public {
-            Project(_projectAddress).refundFunds();
-        }
+
     function logMessage(address _projectAddress, string memory _body)
-        public onlyCreator {
+        public {
+            require(id == msg.sender, "401");          
             Database(dbAddress).addLogMessage(_projectAddress, _body);
         } 
-
-    function voteMilestone(address _milestoneAddress, bool _vote) 
-        public onlyCreator {
-
-            Milestone(_milestoneAddress).updateVote(_vote);
-        }
     
-    function endProject(address _projectAddress, bool _vote)
-        public onlyCreator {
-            Startup(_projectAddress).voteEndProject(_vote);
+    function updateProject(address _address, BackerOption option, bool _vote )
+        public {
+            require(id == msg.sender, "401");   
+            if(option == BackerOption.start) Startup(_address).startProject();
+            else if(option == BackerOption.refund) Project(_address).refundFunds();
+            else if(option == BackerOption.milestone) Milestone(_address).updateVote(_vote);
+            else Startup(_address).voteEndProject(_vote);
         }
 }
 

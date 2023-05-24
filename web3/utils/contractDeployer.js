@@ -11,6 +11,15 @@ async function dbDeployer() {
   return db.address;
 }
 
+async function milestoneLamdaDeployer() {
+  const MilestoneLamda = await ethers.getContractFactory("MilestoneLamda");
+  const milestoneLamda = await MilestoneLamda.deploy();
+
+  await milestoneLamda.deployed();
+
+  return milestoneLamda.address
+}
+
 async function lamdaDeployer() {
   const StartupLamda = await ethers.getContractFactory("StartupLamda");
   const startupLamda = await StartupLamda.deploy();
@@ -22,9 +31,15 @@ async function lamdaDeployer() {
 
   await charityLamda.deployed();
 
+  const BackerLamda = await ethers.getContractFactory("BackerLamda");
+  const backerLamda = await BackerLamda.deploy();
+
+  await backerLamda.deployed();
+
   return {
     startupLamdaAddress : startupLamda.address,
-    charityLamdaAddress : charityLamda.address
+    charityLamdaAddress : charityLamda.address,
+    backerLamdaAddress: backerLamda.address
   };
 }
 
@@ -69,6 +84,24 @@ async function deployContracts() {
 address constant validatorAddress = ${validatorAddress} ; 
 address constant charityLamdaAddress = ${validatorAddress} ;
 address constant startupLamdaAddress = ${validatorAddress} ;
+address constant milestoneLamdaAddress = ${validatorAddress} ;
+address constant backerLamdaAddress = ${validatorAddress} ;
+`);
+
+await hre.run('compile',{
+  force: true,
+  quiet: true
+})
+
+const milestoneLamdaAddress = await milestoneLamdaDeployer();
+
+fs.writeFileSync(solPath, `//SPDX-License-Identifier: UNLICENSED \npragma solidity >=0.7.0 <0.9.0; 
+\naddress constant dbAddress = ${dbAddress} ; 
+address constant validatorAddress = ${validatorAddress} ; 
+address constant charityLamdaAddress = ${validatorAddress} ;
+address constant startupLamdaAddress = ${validatorAddress} ;
+address constant milestoneLamdaAddress = ${milestoneLamdaAddress} ;
+address constant backerLamdaAddress = ${validatorAddress} ;
 `);
 
   await hre.run('compile',{
@@ -76,7 +109,7 @@ address constant startupLamdaAddress = ${validatorAddress} ;
     quiet: true
   })
 
-  const {startupLamdaAddress, charityLamdaAddress} =  await lamdaDeployer();
+  const {startupLamdaAddress, charityLamdaAddress, backerLamdaAddress} =  await lamdaDeployer();
 
   // Saving dbAddress in Solidity file-------------------------------------
 
@@ -85,11 +118,13 @@ address constant startupLamdaAddress = ${validatorAddress} ;
 address constant validatorAddress = ${validatorAddress} ; 
 address constant charityLamdaAddress = ${charityLamdaAddress} ;
 address constant startupLamdaAddress = ${startupLamdaAddress} ;
+address constant milestoneLamdaAddress = ${milestoneLamdaAddress} ;
+address constant backerLamdaAddress = ${backerLamdaAddress} ;
 `);
   
   const crowdfundingAddress = await crowdfundingDeployer();
 
-  return {dbAddress , crowdfundingAddress, charityLamdaAddress, startupLamdaAddress, validatorAddress}
+  return {dbAddress , crowdfundingAddress, charityLamdaAddress, startupLamdaAddress,milestoneLamdaAddress,backerLamdaAddress, validatorAddress }
 }
 
 module.exports = { deployContracts }

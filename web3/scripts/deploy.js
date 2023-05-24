@@ -13,7 +13,7 @@ async function deploy() {
     const constList = require('../../config/constants.js')
     initConstants(constList)
 
-    const {dbAddress , crowdfundingAddress, charityLamdaAddress, startupLamdaAddress, validatorAddress} = await deployer.deployContracts()
+    const {dbAddress , crowdfundingAddress, charityLamdaAddress, startupLamdaAddress,milestoneLamdaAddress,backerLamdaAddress, validatorAddress} = await deployer.deployContracts()
 
     const filePath = path.resolve(__dirname , '..', '..', 'config' , 'contractAddress.json');
     const content = fs.readFileSync(filePath)
@@ -22,8 +22,11 @@ async function deploy() {
     json['dbAddress'] = dbAddress
     json['charityLamdaAddress'] = charityLamdaAddress
     json['startupLamdaAddress'] = startupLamdaAddress
+    json['milestoneLamdaAddress'] = milestoneLamdaAddress
     json['validatorAddress'] = validatorAddress
     json['crowdfundingAddress'] = crowdfundingAddress;
+    json['backerLamdaAddress'] = backerLamdaAddress
+
   
     let newContent = JSON.stringify(json)
   

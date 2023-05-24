@@ -21,5 +21,12 @@ module.exports = {
     "inExecution": 2,
     "rejected": 3,
     "ended": 4
+  },
+
+  BackerOption: {
+    "start": 0,
+    "refund": 1,
+    "milestone": 2,
+    "end": 3
   }
 }

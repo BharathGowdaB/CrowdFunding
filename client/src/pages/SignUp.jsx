@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import {blockchain} from '../assets';
 import { CustomButton, FormField, Loader, Logger } from "../components";
-import { ErrorCode } from "../constants";
 
 import { useStateContext } from "../context";
 
-const Signup = () => {
+const Signup = ({WhiteTheme = true}) => {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +25,7 @@ const Signup = () => {
     isStarter: true,
   });
 
-  const { createUser } = useStateContext();
+  const { createUser, processTransactionError } = useStateContext();
 
   const handleFormFieldChange = (fieldName, e) => {
     setForm({ ...form, [fieldName]: e.target.value });
@@ -54,7 +54,7 @@ const Signup = () => {
     try {
       validateForm();
       const txn = await createUser(form);
-      // await txn.wait();
+      await txn.wait();
 
       setLogger({
         error: false,
@@ -65,10 +65,7 @@ const Signup = () => {
         },
       });
     } catch (error) {
-      const reason = error.reason ? error.reason : error.toString();
-      const message = ErrorCode[reason.split(/execution reverted: /, 2)[1]]
-        ? ErrorCode[reason.split(/execution reverted: /, 2)[1]]
-        : reason.toString();
+      const message = processTransactionError(error).message;
       setLogger({
         error: true,
         message,
@@ -83,16 +80,22 @@ const Signup = () => {
   };
 
   return (
-    <div className="bg-[#1c1c24] flex justify-center items-center flex-col w-full min-h-screen h-full sm:p-[12px] p-[12px]">
+    <div className="bg-[#ffffff] flex justify-center items-center  w-full min-h-screen h-full">
       {isLoading && <Loader />}
-      {isLogging && <Logger {...logger} />}
+      {isLogging && <Logger {...logger} WhiteTheme={WhiteTheme}/>}
+      <div className="h-[100%] max-h-[100vh] bg-blend-multiply shadow-2xl">
+        <img className="bg-blend-multiply max-h-[100vh] contain" src={blockchain}/>
+      </div>
+      <div className="flex flex-1 justify-item p-2 px-20">
 
-      <div className="bg-[#13131a] px-8 py-6 rounded-[12px]  ">
+      
+
+      <div className="bg-[#d0e9fd] px-8 py-4 rounded-[12px] box-shadow">
         <form
           onSubmit={handleSubmit}
           className="w-[300px] flex flex-col gap-[16px]"
         >
-          <h1 className="self-center text-[#1dc071] font-[700] text-[32px]">
+          <h1 className="self-center text-[#116f41] font-[700] text-[32px]">
             Crowdfunding
           </h1>
           <div className="relative flex gap-[16px] text-[#808191] text-[18px] text-center">
@@ -102,34 +105,36 @@ const Signup = () => {
               id="isStrater-Starter"
               value={form.isStarter}
               required
-            ></input>
+            />
             <input
               className="hidden"
               type="radio"
               id="isStrater-Backer"
               value={!form.isStarter}
               required
-            ></input>
+            />
             <label
               className={`z-10 flex-1  signup-label ${
-                form.isStarter && "text-black"
+                form.isStarter && "text-white"
               }`}
               onClick={(e) => setForm({ ...form, ["isStarter"]: true })}
               htmlFor="isStrater-Starter"
             >
-              Starter
+              {" "}
+              Starter{" "}
             </label>
             <label
               className={`z-10 flex-1 signup-label ${
-                !form.isStarter && "text-black"
+                !form.isStarter && "text-white"
               }`}
               onClick={(e) => setForm({ ...form, ["isStarter"]: false })}
               htmlFor="isStrater-Backer"
             >
-              Backer
+              {" "}
+              Backer{" "}
             </label>
             <div
-              className={`z-1 absolute p-4 rounded-[24px] w-[48%] bg-[#1dc071] left-0 transition-[left] duration-700 ${
+              className={`z-1 absolute p-4 rounded-[24px] w-[48%] bg-[#116f41] left-0 transition-[left] duration-700 ${
                 !form.isStarter && "left-[52%]"
               } `}
             ></div>
@@ -140,6 +145,7 @@ const Signup = () => {
             inputType="text"
             value={form.name}
             handleChange={(e) => handleFormFieldChange("name", e)}
+            WhiteTheme = {WhiteTheme}
           />
 
           <FormField
@@ -148,6 +154,7 @@ const Signup = () => {
             inputType="text"
             value={form.description}
             handleChange={(e) => handleFormFieldChange("email", e)}
+            WhiteTheme = {WhiteTheme}
           />
 
           <FormField
@@ -156,6 +163,7 @@ const Signup = () => {
             inputType="password"
             value={form.password}
             handleChange={(e) => handleFormFieldChange("password", e)}
+            WhiteTheme = {WhiteTheme}
           />
 
           <FormField
@@ -164,19 +172,21 @@ const Signup = () => {
             inputType="text"
             value={form.repassword}
             handleChange={(e) => handleFormFieldChange("repassword", e)}
+            WhiteTheme = {WhiteTheme}
           />
 
           <div className="flex justify-center px-[20px] items-center mt-[10px]">
             <CustomButton
               btnType="submit"
               title="Create New Account"
-              styles="bg-[#8c6dfd]"
+              styles="bg-[#115bfb]"
             />
           </div>
         </form>
-        <div className="flex-1 text-center pt-[10px] mt-[32px] text-[#808191] hover:text-[#1dc071] border-[#808191] border-t-[1px]">
+        <div className="flex-1 text-center pt-[10px] mt-[32px] text-[#4f4f50] hover:text-[#1dc071] border-[#4f4f50] border-t-[1px]">
           <a href="/login">Login to Account</a>
         </div>
+      </div>
       </div>
     </div>
   );

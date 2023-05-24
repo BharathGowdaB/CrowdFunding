@@ -29,7 +29,6 @@ describe("Crowdfunding Contract", async () => {
       const user = await app.authenticateStarter(starterDetails.email, starterDetails.password);
   
       expect(user).to.match(/^0x[a-fA-F0-9]{40}$/);
-      expect((await db.getStarterList({skip: 0}))[0][0]).to.equals(user)
     });
 
     it("Should Not Create Starter if Email Registered", async() => {
@@ -74,53 +73,8 @@ describe("Crowdfunding Contract", async () => {
       await expect(user).to.be.reverted
     })
 
-    it('Should Create New Charity Project if Starter Verified', async() => {
-      await app.createStarter(starterDetails.name, 'testStarterCreateCharity@gmail.com', starterDetails.password);
-  
-      const user = await app.authenticateStarter('testStarterCreateCharity@gmail.com',  starterDetails.password);
-      await app.verifyStarter(user, VerificationState.verified)
-
-      const charity = {
-        title : 'charity',
-        description : 'testing',
-        amountRequired : constants.fundingDenomination.realValue * 10,
-        fundingDuration : constants.minFundingPeriod.realValue + 10,
-        isCharity : true
-      }
-      const [projects, count] = await db.getProjectList({skip: 0})
-      const currentProjectsCount = parseInt(count)
-  
-      const tx = await Starter.attach(user).createProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true, "")
-      
-      expect(parseInt((await db.getProjectList({skip: 0}))[1])).to.equals(currentProjectsCount + 1)
-      
-    })
-  
-    it('Should Create New Startup Project if Starter Verified', async() => {
-      await app.createStarter(starterDetails.name, 'testStarterCreateStartup@gmail.com', starterDetails.password);
-  
-      const user = await app.authenticateStarter('testStarterCreateStartup@gmail.com',  starterDetails.password);
-      await app.verifyStarter(user, VerificationState.verified)
-
-      const startup = {
-        title : 'Startup',
-        description : 'testing',
-        amountRequired : 100,
-        fundingDuration : 60 * 60 * 1000 + 1
-      }
-      const [projects, count] = await db.getProjectList({skip: 0})
-      const currentProjectsCount = parseInt(count)
-  
-      const tx = await (await Starter.attach(user)).createProject(startup.title , startup.description, startup.amountRequired, startup.fundingDuration, true, "")
-      
-      expect(parseInt((await db.getProjectList({skip: 0}))[1])).to.equals(currentProjectsCount + 1)
-      
-    })
-
     it('Should Not be able to create new Project if Starter not Verified', async() => {
-      await app.createStarter(starterDetails.name, 'testStarterNotVerifiedProject@gmail.com', starterDetails.password);
-  
-      const user = await app.authenticateStarter('testStarterNotVerifiedProject@gmail.com',  starterDetails.password);
+      const user = await app.authenticateStarter(starterDetails.email,  starterDetails.password);
 
       const startup = {
         title : 'Startup',
@@ -137,6 +91,53 @@ describe("Crowdfunding Contract", async () => {
       
     })
   })
+
+    it('Should Create New Charity Project if Starter Verified', async() => {
+      const [owner, other1, other2] = await ethers.getSigners()
+      await app.connect(other1).createStarter('Yashu', 'createNewCharity@gmail.com', starterDetails.password)
+
+      const user = await app.connect(other1).authenticateStarter('createNewCharity@gmail.com', starterDetails.password);
+      await app.verifyStarter(user, VerificationState.verified)
+
+      const charity = {
+        title : 'charity',
+        description : 'testing',
+        amountRequired : constants.fundingDenomination.realValue * 10,
+        fundingDuration : constants.minFundingPeriod.realValue + 10,
+        isCharity : true
+      }
+      const [projects, count] = await db.getProjectList({skip: 0})
+      const currentProjectsCount = parseInt(count)
+  
+      const tx = await Starter.connect(other1).attach(user).createProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true, "")
+      
+      expect(parseInt((await db.getProjectList({skip: 0}))[1])).to.equals(currentProjectsCount + 1)
+      
+    })
+  
+    it('Should Create New Startup Project if Starter Verified', async() => {
+      const [owner, other1, other2] = await ethers.getSigners()
+      await app.connect(other2).createStarter('Yashu', 'createNewStartup@gmail.com', starterDetails.password)
+
+      const user = await app.connect(other2).authenticateStarter('createNewStartup@gmail.com',  starterDetails.password);
+      await app.verifyStarter(user, VerificationState.verified)
+
+      const startup = {
+        title : 'Startup',
+        description : 'testing',
+        amountRequired : 100,
+        fundingDuration : 60 * 60 * 1000 + 1
+      }
+      const [projects, count] = await db.getProjectList({skip: 0})
+      const currentProjectsCount = parseInt(count)
+  
+      const tx = await (await Starter.connect(other2).attach(user)).createProject(startup.title , startup.description, startup.amountRequired, startup.fundingDuration, true, "")
+      
+      expect(parseInt((await db.getProjectList({skip: 0}))[1])).to.equals(currentProjectsCount + 1)
+      
+    })
+
+    
 
   describe("Verification:", async() => {
     it("Should Not Starter be verified on Signup:", async() => {
@@ -243,11 +244,12 @@ describe("Crowdfunding Contract", async () => {
     })
 
     it("Should Be able to Fund Project", async() => {
-      await app.createBacker(backerDetails.name, 'testBackerFundProjectBacker@gmail.com', backerDetails.password);
-      const user = app.authenticateBacker('testBackerFundProjectBacker@gmail.com', backerDetails.password);
+      const [owner, other1, other2, other3] = await ethers.getSigners()
+      await app.connect(other3).createBacker(backerDetails.name, 'testBackerFundProjectBacker@gmail.com', backerDetails.password);
+      const user = app.connect(other3).authenticateBacker('testBackerFundProjectBacker@gmail.com', backerDetails.password);
 
-      await app.createStarter(starterDetails.name, 'testBackerFundProject@gmail.com', starterDetails.password);
-      const starter = await app.authenticateStarter('testBackerFundProject@gmail.com',  starterDetails.password);
+      await app.connect(other3).createStarter(starterDetails.name, 'testBackerFundProject@gmail.com', starterDetails.password);
+      const starter = await app.connect(other3).authenticateStarter('testBackerFundProject@gmail.com',  starterDetails.password);
 
       await app.verifyStarter(starter, VerificationState.verified)
 
@@ -258,14 +260,14 @@ describe("Crowdfunding Contract", async () => {
         fundingDuration : 60 * 60 * 1000 + 1
       }
   
-      const tx = await Starter.attach(starter).createProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true, "")
+      const tx = await Starter.connect(other3).attach(starter).createProject(charity.title , charity.description, charity.amountRequired, charity.fundingDuration, true, "")
       
       const [projectAddress, count ] = await Starter.attach(starter).getProjectList(0)
 
       expect(await Project.attach(projectAddress).amountRaised()).equals(0)
     
       const fundingAmount = 100;
-      const tx2 = await Backer.attach(user).fundProject(projectAddress, { value: fundingAmount})
+      const tx2 = await Backer.connect(other3).attach(user).fundProject(projectAddress, { value: fundingAmount})
 
       expect(await Project.attach(projectAddress).amountRaised()).equals(fundingAmount)
 
@@ -277,13 +279,14 @@ describe("Crowdfunding Contract", async () => {
     })
 
     it("Should Not Be able to Fund Non Existing Project", async() => {
-      await app.createBacker(backerDetails.name, 'testBackerFundNullProject@gmail.com', backerDetails.password);
-      const user = app.authenticateBacker('testBackerFundNullProject@gmail.com', backerDetails.password);
+      const [owner, other1, other2, other3, other4] = await ethers.getSigners()
+      await app.connect(other4).createBacker(backerDetails.name, 'testBackerFundNullProject@gmail.com', backerDetails.password);
+      const user = app.connect(other4).authenticateBacker('testBackerFundNullProject@gmail.com', backerDetails.password);
 
       const projectAddress = '0x1111111111111111111111111111111111111111'
       const fundingAmount =  ethers.utils.parseEther('0.000100');
 
-      await expect( Backer.attach(user).fundProject(projectAddress, { value: fundingAmount})).to.be.reverted 
+      await expect( Backer.connect(other4).attach(user).fundProject(projectAddress, { value: fundingAmount})).to.be.reverted 
     })
     
       

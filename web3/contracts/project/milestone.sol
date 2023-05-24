@@ -16,19 +16,20 @@ contract Milestone {
     uint private fundsRequired;  
     uint private startTime;
 
-    mapping(address => bool) rejectVotes;
+    mapping(address => bool) public votes;
     uint private maxVotes;
-    uint public cumulativeRejectVotes;
+    uint public cumulativeVotes;
 
-    constructor( string memory _title, string memory _description, uint _fundsRequired,  uint _maxVotes, uint _returnAmount ) {
-        projectId = msg.sender;
+    constructor(address _projectAddress, string memory _title, string memory _description, uint _fundsRequired,  uint _maxVotes, uint _returnAmount ) {
+        projectId = _projectAddress;
         title = _title;
         description = _description;
         fundsRequired = _fundsRequired;
         maxVotes = _maxVotes;
         state = MilestoneState.inVoting;
-        cumulativeRejectVotes = 0;
+        cumulativeVotes = _maxVotes;
         returnAmount = _returnAmount;
+        startTime = block.timestamp;
     }
     
     function getMilestoneDetails()
@@ -36,22 +37,21 @@ contract Milestone {
             return MilestoneDetails(title, description,startTime, state, fundsRequired, returnAmount);
         }
 
-    function updateVote(bool _vote) 
+    function updateVote(bool _reject) 
         public {
-            require(block.timestamp > startTime + votingPeriod, '452');
+            require(votes[msg.sender] != _reject, '449');
+            require(block.timestamp < startTime + votingPeriod, '452');
 
             uint value = Project(projectId).backers(msg.sender);
             require(value > 0, "453");
-        
-            if(rejectVotes[msg.sender] != _vote) return;
 
-            if(_vote){
-                cumulativeRejectVotes -= value;
-            }else {
-                cumulativeRejectVotes += value;
+            if(_reject){
+                cumulativeVotes -= value;
+            } else {
+                cumulativeVotes += value;
             }
 
-            rejectVotes[msg.sender] = !_vote;
+            votes[msg.sender] = _reject;
         }   
 
     function changeState(MilestoneState _state) 
@@ -59,9 +59,10 @@ contract Milestone {
             require(msg.sender == projectId, '401');
             state = _state;
         }
+
     function getVotingResult() 
         public view returns(bool) {
-            return (2 * cumulativeRejectVotes <= maxVotes);
+            return (2 * cumulativeVotes >= maxVotes);
         }
 
 }

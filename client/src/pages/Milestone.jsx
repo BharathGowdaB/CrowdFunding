@@ -1,97 +1,108 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ethers } from "ethers";
 
-import { verified, failed, inProgress,inFunding, tagType, funded} from '../assets';
-import { CustomButton, FormField, Loader, Logger, MilestoneCard } from "../components";
-import { ErrorCode } from "../constants";
-import { daysLeft } from "../utils";
+import {  Loader, Logger, MilestoneCard } from "../components";
 
 import { useStateContext } from "../context";
 
-const Milestone = ({isStarter, userAddress}) => {
-  const navigate = useNavigate();
-  const  { projectAddress:paramAddress } = useParams()
+const Milestone = ({ isStarter, userAddress , WhiteTheme}) => {
+  const { projectAddress: paramAddress } = useParams();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLogging, setIsLogging] = useState(false);
   const [logger, setLogger] = useState({
-    on: false,
     error: false,
     message: "",
+    handleClick: "",
   });
 
   const [projectList, setProjectList] = useState([]);
-  const [projectAddress, setProjectAddress] = useState(paramAddress)
+  const [projectAddress, setProjectAddress] = useState(paramAddress);
 
   const [projectMilestone, setProjectMilestone] = useState([]);
 
-  const {  getUserProjects,getProjectMilestone} = useStateContext();
-
+  const { getUserProjects, getProjectMilestone, getProjectDetails } = useStateContext();
 
   const fetchProjectList = async () => {
     setIsLoading(true);
     const [list, count] = await getUserProjects(userAddress);
-    setProjectList(list);
-    if(paramAddress) setProjectAddress(paramAddress)
-    else setProjectAddress(list[0])
-    setIsLoading(false);
-  }
 
-  const fetchMilestoneList = async() => {
-    setIsLoading(true)
+    let startUpList = []
+
+    for(let i = 0 ; i < count ; i++){
+      let detail = await getProjectDetails(list[i])
+      if(!detail.isCharity) startUpList.push(list[i]) 
+    }
+    setProjectList(startUpList);
+    if (paramAddress) setProjectAddress(paramAddress);
+    else setProjectAddress(startUpList[0]);
+    setIsLoading(false);
+  };
+
+  const fetchMilestoneList = async () => {
+    setIsLoading(true);
     const [list, count] = await getProjectMilestone(projectAddress);
     setProjectMilestone(list);
-    console.log(list)
     setIsLoading(false);
-  }
+  };
 
-  const fetchDetails = async() => {
-        setIsLoading(true)
-        try{
-        await fetchProjectList()
-        } catch(error){
-            console.log(error)
-        }
-        setIsLoading(false)
+  const fetchDetails = async () => {
+    setIsLoading(true);
+    try {
+      await fetchProjectList();
+    } catch (error) {
+      console.log(error);
     }
-
-    useEffect(() => {
-        if(projectAddress)
-            fetchMilestoneList()
-    },[projectAddress])
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    if(userAddress)
-        fetchDetails()
-  },[userAddress])
+    if (projectAddress) fetchMilestoneList();
+  }, [projectAddress]);
+
+  useEffect(() => {
+    if (userAddress) fetchDetails();
+  }, [userAddress]);
 
   return (
-      <>
-        <div className={`flex-1 justify-between items-center bg-[#1c1c24] rounded-[12px] w-fit p-4 mb-4`}>
-            <div className=" w-full">
-                <label className="text-[#b2b3bd]">Project Address:</label>
-                <select onChange={(e) => setProjectAddress(e.target.value)} id='projectList' className="bg-[#1c1c24] text-[#b2b3bd]  p-1 outline-0 rounded-[8px]">
-                    {projectList.map(address =>( <option className="p-1" key={address} value={address}>{address}</option>))}
-                </select>
-            </div>
+    <>
+      {isLoading && <Loader />}
+      {isLogging && <Logger {...logger} WhiteTheme={WhiteTheme}/>}
+      <div
+        className={` flex-1 justify-between items-center ${WhiteTheme ? "box-shadow bg-[#ffffff]" : "bg-[#1c1c24]"} rounded-[12px] w-fit p-4 mb-4`}
+      >
+        <div className=" w-full">
+          <label className={` ${WhiteTheme ? "text-[#4f4f50]" : "text-[#b2b3bd]"}`}>Project Address:</label>
+          <select
+            onChange={(e) => setProjectAddress(e.target.value)}
+            id="projectList"
+            className={` p-1 outline-0 rounded-[8px] ${WhiteTheme ? "text-[#4f4f50] bg-[#ffffff]" : "text-[#b2b3bd] bg-[#1c1c24]"}`}
+          >
+            {projectList.map((address) => (
+              <option className="p-1" key={address} value={address}>
+                {address}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="w-full">
-            {
-                projectMilestone.map(milestone => (
-                    <MilestoneCard
-                        key={milestone}  
-                        milestoneAddress={milestone} 
-                        projectAddress={projectAddress}
-                        userAddress={userAddress}
-                        isStarter={isStarter}
-                   />
-                ))
-            }
-        </div>
-      </>
-  )
+      </div>
+      <div className="w-full">
+        {projectMilestone.map((milestone) => (
+          <MilestoneCard
+            key={milestone}
+            milestoneAddress={milestone}
+            projectAddress={projectAddress}
+            userAddress={userAddress}
+            isStarter={isStarter}
+            setIsLoading={setIsLoading}
+            setIsLogging={setIsLogging}
+            setLogger={setLogger}
+            WhiteTheme={WhiteTheme}
+          />
+        ))}
+      </div>
+    </>
+  );
+};
 
-}
-
-export default Milestone
+export default Milestone;

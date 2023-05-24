@@ -13,6 +13,10 @@ enum MilestoneState {
 	initial, inVoting, inExecution, rejected, ended
 }
 
+enum BackerOption {
+	start, refund, milestone, end
+}
+
 struct AttestData {
 	string name; 
 	string panNumber; 

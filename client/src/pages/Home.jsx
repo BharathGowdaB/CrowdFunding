@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react'
 
-import { DisplayProjects, Pagination, Loader, Logger } from '../components';
+import { DisplayProjects, Pagination, Loader } from '../components';
 import { useStateContext} from '../context';
 
-const Home = () => {
+const Home = ({WhiteTheme}) => {
     const [isLoading, setIsLoading] = useState(false);
-    const [isLogging, setIsLogging] = useState(false)
-    const [logger, setLogger] = useState({ on: false, error: false, message: ""});
-
-    const { getProjectList } = useStateContext()
 
     const [projectList, setProjectList] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
@@ -22,17 +18,7 @@ const Home = () => {
 
     const maxObjectPerPage = 12;
 
-
-    useEffect(() => {
-        const skip = (currentPage) * maxObjectPerPage;
-        fetchProjectList({skip, ...sortBy});
-    }, [currentPage]);
-
-    useEffect(() => {
-        setCurrentPage(0)
-        fetchProjectList({skip: 0, ...sortBy})
-    }, [sortBy])
-
+    const { getProjectList } = useStateContext()
 
     const fetchProjectList = async (sortBy) => {
         setIsLoading(true);
@@ -45,10 +31,19 @@ const Home = () => {
         setIsLoading(false);
     }
 
+    useEffect(() => {
+        const skip = (currentPage) * maxObjectPerPage;
+        fetchProjectList({skip, ...sortBy});
+    }, [currentPage]);
+
+    useEffect(() => {
+        setCurrentPage(0)
+        fetchProjectList({skip: 0, ...sortBy})
+    }, [sortBy])
+
   return (
     <>
         {isLoading && <Loader/>}
-        {isLogging && <Logger {...logger}/>}
         <DisplayProjects
             title = {"All Projects"} 
             total = {projectCount}
@@ -57,13 +52,15 @@ const Home = () => {
             sortBy = {sortBy}
             setSortBy = {setSortBy}
             emptyMessage = {'No Projects found'}
-            clickURL = 'project-details'
+            clickURL = 'project'
+            WhiteTheme = {WhiteTheme}
         />
         <Pagination
         total={projectCount}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         objectPerPage={maxObjectPerPage}
+        WhiteTheme = {WhiteTheme}
         />
     </>
     

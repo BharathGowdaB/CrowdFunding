@@ -20,6 +20,7 @@ contract Charity is Project {
             require(state == ProjectState.inFunding, "441");
             require(block.timestamp >= endTime, "440");
 
+            emit fundsReleased(starterId, address(this).balance, block.timestamp );
             payable(id).transfer(address(this).balance);
             state = ProjectState.ended;
         }
@@ -33,6 +34,8 @@ contract Charity is Project {
                 if(backers[backersList[i]] == 0) continue;
                 (bool sent,) = payable(User(backersList[i]).id()).call{value : backers[backersList[i]]}("");
                 require(sent == true, '500');
+                
+                emit fundsReleased(backersList[i], backers[backersList[i]], block.timestamp);
                 backers[backersList[i]] = 0;
             }
 

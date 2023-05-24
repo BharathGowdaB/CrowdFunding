@@ -33,4 +33,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   transition: color 1s;
 }
 
+.box-shadow {
+  box-shadow: 0 0px 15px 0px rgba(0, 0, 0, 0.279), 0 8px 10px -6px rgb(0 0 0 / 0.1);;
+}
 
+.box-shadow-large {
+  box-shadow: 0 0px 30px 0px rgba(0, 0, 0, 0.164), 0 8px 10px -6px rgb(0 0 0 / 0.1);;
+}
+
+
+.box-shadow-icon {
+  box-shadow: 0 0px 30px -5px rgba(0, 0, 0, 0.315), 0 8px 10px -6px rgb(0 0 0 / 0.1);;
+}

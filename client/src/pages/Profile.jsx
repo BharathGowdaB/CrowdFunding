@@ -3,31 +3,33 @@ import React, { useState, useEffect } from 'react'
 import { verified, failed, inProgress} from '../assets';
 import { CustomButton, DisplayProjects, Loader, Logger , FormField} from '../components';
 import { useStateContext} from '../context';
-import { ErrorCode } from '../constants';
 import { useNavigate } from 'react-router-dom';
 
-const Profile = ( { isStarter, userAddress}) => {
+const Profile = ( { isStarter, userAddress, WhiteTheme}) => {
     const navigate = useNavigate();
+
     const [isLoading, setIsLoading] = useState(false);
     const [isLogging, setIsLogging] = useState(false)
     const [logger, setLogger] = useState({ on: false, error: false, message: ""});
 
-    const { getUserProjects ,getUserDetails, checkStarterVerified, applyForVerification} = useStateContext()
-
     const [projectList, setProjectList] = useState([]);
     const [projectCount, setProjectCount] = useState(0);
+    const [isVerificationForm , setIsVerificationForm] = useState(false)
+    
     const [userDetails, setUserDetails] = useState({
       name: '',
       verified: 0,
       email: ''
     })
-    const [isVerificationForm , setIsVerificationForm] = useState(false)
+    
     const [form, setForm] = useState({
       name: '',
       email: '',
       password: '',
       panNumber: ''
     })
+
+    const { getUserProjects ,getUserDetails, checkStarterVerified, applyForVerification, processTransactionError} = useStateContext()
 
     const handleFormFieldChange = (fieldName, e) => {
       setForm({ ...form, [fieldName]: e.target.value })
@@ -39,15 +41,16 @@ const Profile = ( { isStarter, userAddress}) => {
         e.preventDefault();
         await applyForVerification(form)
         setIsVerificationForm(false)
-
+        setLogger({error: false, message: 'Successfully Applied for Verification, check back after some time.' , handleClick: function() {
+          setIsLogging(false)
+        }})
       } catch(error) {
-        const reason = error.reason ? error.reason : error.toString()
-        const message = ErrorCode[error.reason.split(/execution reverted: /, 2)[1]] ? ErrorCode[error.reason.split(/execution reverted: /, 2)[1]] : reason.toString()
+        const { message } = processTransactionError(error)
         setLogger({error: true, message , handleClick: function() {
           setIsLogging(false)
         }})
-        setIsLogging(true)
       }
+      setIsLogging(true)
       setIsLoading(false)
     }
 
@@ -62,6 +65,7 @@ const Profile = ( { isStarter, userAddress}) => {
     }
 
     const fetchDetails = async () => {
+      setIsLoading(true);
       try{
           if(!userAddress) return
           await fetchProjectList();
@@ -74,60 +78,64 @@ const Profile = ( { isStarter, userAddress}) => {
               verified: verificationState
           })
       } catch(error){
-          setLogger({
-              error: false, 
-              message: error.toString(), 
-              handleClick : () => {
+          const { message } = processTransactionError(error)
+          setLogger({error: false,  message, handleClick : () => {
                   navigate('/home')
                   setIsLogging(false)
               }
           })
           setIsLogging(true)
       }
-  }
+      setIsLoading(false);
+    }
 
     useEffect(() => {
-      fetchDetails()
+      if(userAddress) fetchDetails()
+      else {
+        userAddress = window.sessionStorage.getItem("userAddress")
+        isStarter = (window.sessionStorage.getItem("isStarter") == "true")
+        if(!( userAddress )) navigate('/login')
+      }
     },[userAddress])
 
     
   return (
     <>
         {isLoading && <Loader/>}
-        {isLogging && <Logger {...logger}/>}
-        <div className="flex-1 flex  justify-between items-center bg-[#1c1c24] rounded-[12px] w-full p-4 mt-8 mb-4"> 
-            <div>
-                <h1 className="flex-1 font-epilogue font-semibold text-[30px] capitalize text-white text-left min-w-[150px]">{userDetails.name}</h1>
-                <h1 className="flex-1 font-epilogue font-[700] text-[16px] mt-[8px] text-[#b2b3bd] text-left grayscale">Email: {userDetails.email}</h1>
-                <h1 className="flex-1 font-epilogue font-[400] text-[12px] mt-[4px] text-[#b2b3bd] text-left grayscale">Address: {userAddress}</h1>
+        {isLogging && <Logger {...logger} WhiteTheme={WhiteTheme}/>}
+        <div className={`flex-1 flex  justify-between items-center ${WhiteTheme ? "bg-[#ffffff] box-shadow" : "bg-[#1c1c24]"} rounded-[12px] w-full p-4 mt-8 mb-4`}> 
+            <div >
+                <h1 className={`flex-1 font-epilogue font-semibold text-[30px] capitalize ${WhiteTheme ? "text-[#101010]": "text-white"} text-left min-w-[150px]`}>{userDetails.name}</h1>
+                <h1 className={`flex-1 font-epilogue font-[700] text-[16px] mt-[8px] ${WhiteTheme ? "text-[#4f4f50]" : "text-[#b2b3bd]"} text-left grayscale`}>Email: {userDetails.email}</h1>
+                <h1 className={`flex-1 font-epilogue font-[400] text-[12px] mt-[4px] ${WhiteTheme ? "text-[#4f4f50]" : "text-[#b2b3bd]"} text-left grayscale `}>Address: {userAddress}</h1>
             </div>
-            <div className='relative cursor-pointer'>
+            <div className='relative'>
   
               {userDetails.verified == 0 && 
                   <div className='flex text-white font-[600] text-[16px] items-center'> 
-                      <label htmlFor="start-verification" className='p-[10px] pl-[8px] min-h-[36px] text-[#b2b3bd]' >Not Verified</label>
+                      <label htmlFor="start-verification" className={`cursor-pointer p-[10px] pl-[8px] min-h-[36px] ${WhiteTheme ? "text-[#4f4f50]" : "text-[#b2b3bd]"}`} >Not Verified</label>
                   </div>}  
               {userDetails.verified == 1 && 
                   <div className='flex text-white font-[600] text-[16px] items-center'> 
                       <img src={inProgress} title="Verification InProgress" alt="Verification InProgress" className="w-[36px] h-[36px] object-contain"/> 
-                      <label htmlFor="start-verification" className='p-[10px] pl-[8px] min-h-[36px] text-[#b2b3bd]'>Verifying</label>
+                      <label htmlFor="start-verification" className={`cursor-pointer p-[10px] pl-[8px] min-h-[36px] ${WhiteTheme ? "text-[#4f4f50]" : "text-[#b2b3bd]"}`}>Verifying</label>
                   </div>} 
               {userDetails.verified == 2 && 
                   <div className='flex text-white font-[600] text-[16px] items-center'> 
                       <img src={failed} title="Verification Failed" alt="Verification Failed" className="w-[32px] h-[32px] object-contain"/> 
-                      <label htmlFor="start-verification" className='p-[10px] pl-[8px] min-h-[36px] text-[#b2b3bd]'>Verification Failed</label>
+                      <label htmlFor="start-verification" className={`cursor-pointer p-[10px] pl-[8px] min-h-[36px] ${WhiteTheme ? "text-[#4f4f50]" : "text-[#b2b3bd]"}`}>Verification Failed</label>
                   </div>}  
               {userDetails.verified == 3 && 
                   <div className='flex text-white font-[600] text-[16px] items-center'> 
                       <img src={verified} title="Verified" alt="Verified" className="w-[36px] h-[36px] object-contain"/> 
-                      <div className='p-[10px] pl-[8px] min-h-[36px] text-[#b2b3bd]'>Verified</div>
+                      <div className={`p-[10px] pl-[8px] min-h-[36px] ${WhiteTheme ? "text-[#4f4f50]" : "text-[#b2b3bd]"}`}>Verified</div>
                   </div>}
               
               <input type='checkbox' className='hidden' onChange={(e) => setIsVerificationForm(e.target.checked)} id='start-verification' name="start-verification form"/>
-              {userDetails.verified != 3 &&  <label htmlFor='start-verification' className='text-[#b2b3bd] text-[12px]'>click for verification</label>}
+              {userDetails.verified != 3 &&  <label htmlFor='start-verification' className={`cursor-pointer ${WhiteTheme ? "text-[#4f4f50]" : "text-[#b2b3bd]"} text-[12px]`}>click for verification</label>}
               {
                 isVerificationForm && 
-                  <div className='absolute right-0 p-4 bg-[#1c1c24] border-2 border-[#2c2f32] text-white'>
+                  <div className={`absolute right-0 p-4 ${WhiteTheme ? "bg-[#ffffff] text-black" : "text-white bg-[#1c1c24]" } border-2 border-[#2c2f32] `}>
                     <form onSubmit={handleSubmit} className='flex flex-col justify-center gap-6'>
                       <FormField 
                         labelName="Name *"
@@ -135,6 +143,7 @@ const Profile = ( { isStarter, userAddress}) => {
                         inputType="text"
                         value={form.name}
                         handleChange={(e) => handleFormFieldChange('name', e)}
+                        WhiteTheme = {WhiteTheme}
                       />
                       <FormField 
                         labelName="Email *"
@@ -142,6 +151,7 @@ const Profile = ( { isStarter, userAddress}) => {
                         inputType="text"
                         value={form.email}
                         handleChange={(e) => handleFormFieldChange('email', e)}
+                        WhiteTheme = {WhiteTheme}
                       />
                       <FormField 
                         labelName="Password *"
@@ -149,6 +159,7 @@ const Profile = ( { isStarter, userAddress}) => {
                         inputType="password"
                         value={form.password}
                         handleChange={(e) => handleFormFieldChange('password', e)}
+                        WhiteTheme = {WhiteTheme}
                       />
                       <FormField 
                         labelName="Pan Number *"
@@ -156,6 +167,7 @@ const Profile = ( { isStarter, userAddress}) => {
                         inputType="text"
                         value={form.panNumber}
                         handleChange={(e) => handleFormFieldChange('panNumber', e)}
+                        WhiteTheme = {WhiteTheme}
                       />
                       <div className="flex justify-center items-center mt-[4px]">
                         <CustomButton 
@@ -176,6 +188,7 @@ const Profile = ( { isStarter, userAddress}) => {
             isLoading = {isLoading}
             projectList = {projectList}
             clickURL = 'project'
+            WhiteTheme = {WhiteTheme}
         />
     </>
     
