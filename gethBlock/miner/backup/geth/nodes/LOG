@@ -1,0 +1,22 @@
+=============== May 16, 2023 (IST) ===============
+18:44:10.427730 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:44:10.430951 db@open opening
+18:44:10.432744 version@stat F·[] S·0B[] Sc·[]
+18:44:10.434657 db@janitor F·2 G·0
+18:44:10.434657 db@open done T·3.7059ms
+=============== May 19, 2023 (IST) ===============
+18:58:31.623809 db@close closing
+18:58:31.624906 db@close done T·1.0977ms
+=============== May 19, 2023 (IST) ===============
+18:58:35.206656 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:58:35.206656 version@stat F·[] S·0B[] Sc·[]
+18:58:35.207660 db@open opening
+18:58:35.207660 journal@recovery F·1
+18:58:35.208731 journal@recovery recovering @1
+18:58:35.210958 memdb@flush created L0@2 N·14 S·334B "loc..seq,v7":"version,v1"
+18:58:35.212982 version@stat F·[1] S·334B[334B] Sc·[0.25]
+18:58:35.218534 db@janitor F·3 G·0
+18:58:35.218534 db@open done T·10.8742ms
+=============== May 21, 2023 (IST) ===============
+11:13:56.178085 db@close closing
+11:13:56.178398 db@close done T·312.3µs

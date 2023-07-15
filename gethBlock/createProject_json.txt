@@ -1,0 +1,82 @@
+[
+  {
+    "title": "Education Initiative",
+    "description": "Provide educational resources to underprivileged children",
+    "amountRequired": 5000,
+    "fundingDuration": 60,
+    "isCharity": true,
+    "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPp-bE7U1WqxRyPyv2fzifh2bPh5lFM_FrjA&usqp=CAU"
+  },
+  {
+    "title": "Tech Startup",
+    "description": "Develop innovative technology solutions",
+    "amountRequired": 100000,
+    "fundingDuration": 90,
+    "isCharity": false,
+    "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRqK_Fl1gJaV16KHV5iCio1pl0o-3Pz_07oQ&usqp=CAU"
+  },
+  {
+    "title": "Healthcare Program",
+    "description": "Support healthcare initiatives in rural areas",
+    "amountRequired": 15000,
+    "fundingDuration": 45,
+    "isCharity": true,
+    "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHY9v1GvybVO6WDYMx5Djwx_0YvrSC-4O5gg&usqp=CAU"
+  },
+  {
+    "title": "Art Exhibition",
+    "description": "Organize a community art exhibition",
+    "amountRequired": 8000,
+    "fundingDuration": 30,
+    "isCharity": false,
+    "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxhS3ZIWtwgKw45p2H1AcBMiXroQtuxExmcQ&usqp=CAU"
+  },
+  {
+    "title": "Clean Energy Project",
+    "description": "Promote renewable energy sources",
+    "amountRequired": 25000,
+    "fundingDuration": 60,
+    "isCharity": true,
+    "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWznWOx5x2umoxdhInbbpw-TX5PtYidJ--0VBPvsAiWg&s"
+  },
+  {
+    "title": "Youth Mentorship Program",
+    "description": "Provide mentorship to at-risk youth",
+    "amountRequired": 10000,
+    "fundingDuration": 45,
+    "isCharity": true,
+    "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhEVMHJgAKAmz1RfNQPKKnXmjcSfPYfNBERw&usqp=CAU"
+  },
+  {
+    "title": "Community Garden",
+    "description": "Create a sustainable community garden",
+    "amountRequired": 5000,
+    "fundingDuration": 30,
+    "isCharity": false,
+    "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCowO5fXXMl3RsqtmBPEXNdRvUZyQewGGKbw&usqp=CAU"
+  },
+  {
+    "title": "Animal Shelter Expansion",
+    "description": "Expand facilities and services for animal shelter",
+    "amountRequired": 20000,
+    "fundingDuration": 60,
+    "isCharity": true,
+    "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrJfIzfh0sBAVRySkTiiNpG57L0Sarp-okIv9VyJ3OWw&s"
+  },
+  {
+    "title": "Sports Development Program",
+    "description": "Support youth sports development in the community",
+    "amountRequired": 12000,
+    "fundingDuration": 45,
+    "isCharity": false,
+    "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXXwNaQYFasbKEY-Rr0uFaYlN1Po3m6VvKEduySFjVaQ&s"
+  },
+  {
+    "title": "Emergency Relief Fund",
+    "description": "Provide assistance during natural disasters",
+    "amountRequired": 50000,
+    "fundingDuration": 90,
+    "isCharity": true,
+    "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCT06N6n0V0C820f53PQjkoK47esApqU5m7DhzsoXPBa3bImgj2OX11m-1T18XYyqqHIo&usqp=CAU"
+  }
+]

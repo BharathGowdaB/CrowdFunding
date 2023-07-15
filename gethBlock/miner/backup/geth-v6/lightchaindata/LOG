@@ -1,0 +1,32 @@
+=============== May 17, 2023 (IST) ===============
+16:57:16.068228 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:57:16.071478 db@open opening
+16:57:16.072009 version@stat F·[] S·0B[] Sc·[]
+16:57:16.073071 db@janitor F·2 G·0
+16:57:16.073071 db@open done T·1.5928ms
+16:57:16.086108 db@close closing
+16:57:16.086617 db@close done T·509µs
+=============== May 21, 2023 (IST) ===============
+17:22:50.811483 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+17:22:50.813057 version@stat F·[] S·0B[] Sc·[]
+17:22:50.813057 db@open opening
+17:22:50.813269 journal@recovery F·1
+17:22:50.815311 journal@recovery recovering @1
+17:22:50.818258 memdb@flush created L0@2 N·25 S·1KiB "\x1cn<..\x12T\x97,v13":"\xcfV>..\xdd\x1c\xc3,v11"
+17:22:50.820996 version@stat F·[1] S·1KiB[1KiB] Sc·[0.25]
+17:22:50.825773 db@janitor F·3 G·0
+17:22:50.825773 db@open done T·12.7164ms
+17:22:50.831546 db@close closing
+17:22:50.832070 db@close done T·524.6µs
+=============== May 23, 2023 (IST) ===============
+17:28:20.780488 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+17:28:20.780488 version@stat F·[1] S·1KiB[1KiB] Sc·[0.25]
+17:28:20.780488 db@open opening
+17:28:20.780488 journal@recovery F·1
+17:28:20.786015 journal@recovery recovering @3
+17:28:20.789015 memdb@flush created L0@5 N·1 S·433B "eth..j\xfa\xff,v27":"eth..j\xfa\xff,v27"
+17:28:20.794564 version@stat F·[2] S·2KiB[2KiB] Sc·[0.50]
+17:28:20.801559 db@janitor F·4 G·0
+17:28:20.801559 db@open done T·21.0715ms
+17:28:20.809734 db@close closing
+17:28:20.810238 db@close done T·504.3µs

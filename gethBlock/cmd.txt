@@ -1,0 +1,78 @@
+HTTP connection:
+geth attach http://localhost:8545
+
+bootnode
+
+bootnode -nodekey boot.key -addr :30305
+
+
+Initialize Nodes: 
+>> geth init --datadir miner genesis.json
+
+>> geth init --datadir node1 genesis.json
+
+node1 : miner
+
+>> geth --datadir miner  `
+--bootnodes enode://223ed69749db9eedb9958637b50b8b2318f61b3a130adaa0e93fab804332fd4e145a5411fbf374c52ef1283a4b94db28d2c6cbc949105fa7cafc8ca5a47ba7b1@127.0.0.1:0?discport=30305 `
+--networkid 1337 --port 30306 `
+--unlock f013f448edc51da63de88e3ae41467bea256cc25 --password miner/password.txt `
+--authrpc.port 8551 `
+--ipcdisable console `
+--http.corsdomain="*" --http.api web3,eth,debug,personal,net `
+--syncmode 'full' `
+--mine --miner.etherbase 0xf013f448edc51da63de88e3ae41467bea256cc25 
+
+
+
+Bharath
+
+>> geth --datadir node1  `
+--bootnodes enode://223ed69749db9eedb9958637b50b8b2318f61b3a130adaa0e93fab804332fd4e145a5411fbf374c52ef1283a4b94db28d2c6cbc949105fa7cafc8ca5a47ba7b1@127.0.0.1:0?discport=30305 `
+--networkid 1337 --port 30307 `
+--unlock 4609bb10246A338D1abCCF027667607147cD19F0--password node1/password.txt `
+--authrpc.port 8552 `
+--ipcdisable console `
+--http.corsdomain="*" --http.api web3,eth,debug,personal,net `
+--syncmode 'full'
+--mine --miner.etherbase 0x4609bb10246A338D1abCCF027667607147cD19F0
+
+
+Harish:
+
+>> geth --datadir node1  `
+--bootnodes enode://223ed69749db9eedb9958637b50b8b2318f61b3a130adaa0e93fab804332fd4e145a5411fbf374c52ef1283a4b94db28d2c6cbc949105fa7cafc8ca5a47ba7b1@127.0.0.1:0?discport=30305 `
+--networkid 1337 --port 30307 `
+--unlock B00E512A579Cc6D6765b4063ace20383BA2a5c51--password node1/password.txt `
+--authrpc.port 8552 `
+--ipcdisable console `
+--http.corsdomain="*" --http.api web3,eth,debug,personal,net `
+--syncmode 'full'
+--mine --miner.etherbase 0xB00E512A579Cc6D6765b4063ace20383BA2a5c51
+
+
+Chiranth:
+
+>> geth --datadir node1  `
+--bootnodes enode://223ed69749db9eedb9958637b50b8b2318f61b3a130adaa0e93fab804332fd4e145a5411fbf374c52ef1283a4b94db28d2c6cbc949105fa7cafc8ca5a47ba7b1@127.0.0.1:0?discport=30305 `
+--networkid 1337 --port 30307 `
+--unlock E563720b9b84957d66713cE8dB84B7af9d7Fb7cF--password node1/password.txt `
+--authrpc.port 8552 `
+--ipcdisable console `
+--http.corsdomain="*" --http.api web3,eth,debug,personal,net `
+--syncmode 'full'
+--mine --miner.etherbase 0xE563720b9b84957d66713cE8dB84B7af9d7Fb7cF
+
+
+Anshul:
+
+>> geth --datadir node1  `
+--bootnodes enode://223ed69749db9eedb9958637b50b8b2318f61b3a130adaa0e93fab804332fd4e145a5411fbf374c52ef1283a4b94db28d2c6cbc949105fa7cafc8ca5a47ba7b1@127.0.0.1:0?discport=30305 `
+--networkid 1337 --port 30307 `
+--unlock c4408b572A662977768f8c350d4fc9Ba3F72d0ef--password node1/password.txt `
+--authrpc.port 8552 `
+--ipcdisable console `
+--http.corsdomain="*" --http.api web3,eth,debug,personal,net `
+--syncmode 'full'
+--mine --miner.etherbase 0xc4408b572A662977768f8c350d4fc9Ba3F72d0ef
+

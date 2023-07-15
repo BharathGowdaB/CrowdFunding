@@ -1,0 +1,8 @@
+[
+{
+title: Project Planning
+description: Gather Required information, do requirement analysis and feasibility study.
+funds required: 120
+returnAmount: 0
+}
+]
