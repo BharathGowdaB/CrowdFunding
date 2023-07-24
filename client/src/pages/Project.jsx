@@ -819,6 +819,9 @@ const Project = ({ isStarter, userAddress, WhiteTheme }) => {
       )}
       </div>
       <div className="w-[300px] flex flex-col gap-4">
+        <div className={`flex justify-center font-bold text-[#8c6dfd] text-[20px] px-[8px] gap-1 py-[8px]  ${WhiteTheme ? "shadow bg-[#ffffff]" : "bg-[#1c1c24]"}`}>
+          Transaction History
+        </div>
         {lastTransactions.map((log) => {
           return (<div
           key={log.time}
